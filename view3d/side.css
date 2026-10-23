@@ -1,0 +1,126 @@
+/* What the 3D page, ../3d.html, has in its sides, its menu and its full screen beyond what its
+   own styles say - which have too few lines left to hold it. The look is ../frame.css's: its
+   custom properties. The page links this after its own styles. */
+
+/* File's Google Earth rows (T-016.4), as they stood in 3d.html. Why the 3D file is off stands
+   right under its entry, with no line between the two. */
+#save-why,
+#earth-why {
+  margin-top: 0;
+  padding-top: 2px;
+  border-top: 0;
+}
+/* The raise in Google Earth, under its entry: a quiet row, its field a few figures wide. */
+#earth-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 10px 4px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+/* A level's row (ST-033): its button, and after it the switch of what stands on it. "All" has
+   none, and its button the row's width. */
+#levels li {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+#levels button {
+  flex: 1;
+  min-width: 0;
+}
+#levels input,
+#switches input {
+  flex: none;
+  margin: 0;
+}
+
+/* Under the levels, what shows: a section a row, and a group of objects a row - its switch, and
+   its name, cut short with an ellipsis where the side is too narrow; its title says it in full.
+   Its headings, its lists and its quiet line are a side's own (frame.css). */
+#switches h2 {
+  margin-top: 16px;
+}
+#switches label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 26px;
+}
+#switches span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Under the objects, "Open along" (ST-033): a side a row, as a level is - its button the row's
+   width, and the one that is open has the ink (frame.css). */
+#switch-opens button {
+  width: 100%;
+  height: 30px;
+  margin-bottom: 2px;
+  text-align: left;
+  white-space: nowrap;
+}
+
+/* A figure of the house, in Settings right of the stage (T-024.9, T-029.5), as it stood in
+   3d.html: its words, then its field - a quiet band - with its unit and its way back, then its
+   range - and, in the pad's red, why what was typed is not taken. */
+#figures li {
+  padding: 6px 0 8px;
+}
+#figures label,
+#figures small {
+  display: block;
+}
+#figures .group {
+  display: flex;
+  margin: 4px 0 2px;
+}
+#figures input {
+  width: 4.5em;
+}
+#figures button {
+  margin-left: auto;
+}
+#figures small {
+  color: var(--faint);
+}
+#figures .refused,
+#settings-said {
+  color: #b91c1c;
+  font-weight: 600;
+}
+
+/* Full screen (T-033.6): the stage alone, and nothing else of the page - no header, no line of
+   words, no side. With them gone the stage is the whole window, or the whole screen where the
+   browser gives its own: its observer draws it at that size, and no camera moves. */
+body[data-full='on'] :is(header, #said, #side, #settings) {
+  display: none;
+}
+/* The two small buttons of its corner, which full.js makes in the stage's place: quiet, at its
+   top right, over the stage - a small panel as a menu floats (frame.css), each button with no box
+   of its own - and only while the stage is alone. Neither is in a picture: that is the canvas. */
+#full-corner {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: none;
+  gap: 2px;
+  padding: 4px;
+  border-radius: 8px;
+  background: var(--paper);
+  box-shadow: var(--shadow);
+}
+body[data-full='on'] #full-corner {
+  display: flex;
+}
+/* Its button stands in the toolbar right after Settings, and the name of the plot takes 4em at
+   the least here, where frame.css gives it 8em: so the toolbar is one line from 1276 pixels on,
+   in the tests' window of 1280 too, as it was from 1263 without the button. */
+#title {
+  flex-basis: 4em;
+}

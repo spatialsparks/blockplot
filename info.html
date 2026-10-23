@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <!-- The page asks nothing of any machine, this one included (directive 34). -->
+    <meta http-equiv="Content-Security-Policy" content="connect-src 'none'" />
+    <title>Sketch pad</title>
+    <!-- The frame, which this page shares with the two others: the toolbar, a control, and the
+         one look; the small drawings of the toolbar's controls; and what this page alone has,
+         its tables and its rates (info/info.css), in that look. -->
+    <link rel="stylesheet" href="frame.css" />
+    <link rel="stylesheet" href="icons.css" />
+    <link rel="stylesheet" href="info/info.css" />
+  </head>
+  <body>
+    <!-- The toolbar: File and View, where the pad's own page has them, then the words that name
+         the plot. File is in its place and not seen: this page has nothing to open or to save.
+         It keeps its place, so that the switch of views stands where the pad has it. -->
+    <header>
+      <span class="group away" id="file-group" role="group" aria-labelledby="file-menu">
+        <button type="button" id="file-menu" aria-expanded="false" aria-controls="file-entries">
+          File
+        </button>
+        <span class="menu" id="file-entries" hidden></span>
+      </span>
+      <!-- The switch is the pad's, views.js: the page tells it here that it is the seventh view. -->
+      <span class="group" id="view-group" role="group" aria-label="View">
+        <nav class="group" id="views" data-view="info"></nav>
+      </span>
+      <strong id="title"></strong>
+    </header>
+    <!-- The page's own words, in a line of their own. Until info/page.js says otherwise, what
+         holds where it did not load: the page was opened from a file, or the pad is an older one. -->
+    <p id="info-said" role="status">
+      The Info page did not load. It comes from the pad's own server: stop the pad if it runs, start
+      it again with pnpm sketch, and open the page from there.
+    </p>
+    <!-- What the sketch adds up to: info/page.js writes it, of sums.js, and the rates. -->
+    <main id="info">
+      <p id="info-none" hidden>Nothing is drawn yet.</p>
+      <p id="info-house" hidden></p>
+      <p id="info-is" hidden>
+        These figures are the sketch's own: the floor of a block as it is drawn, its walls included,
+        and what the block encloses from its floor to its top. They are not the areas or the volumes
+        that the building law counts.
+      </p>
+      <section id="info-rates" aria-labelledby="rates-title">
+        <h2 id="rates-title">The rates of a rough cost</h2>
+        <ul id="rates"></ul>
+        <p id="rates-are"></p>
+      </section>
+      <table id="info-sections" hidden></table>
+      <table id="info-levels" hidden></table>
+      <table id="info-categories" hidden></table>
+      <p id="info-twice" hidden></p>
+      <p id="info-through" hidden></p>
+      <p id="info-apart" hidden></p>
+    </main>
+    <!-- The scripts of the pad that read the sketch, and its switch of views; then the sections,
+         the rates, what the sketch adds up to, and this page. -->
+    <template id="scripts">
+      <script src="site.js"></script>
+      <script src="squares.js"></script>
+      <script src="paper.js"></script>
+      <script src="figures.js"></script>
+      <script src="shapes.js"></script>
+      <script src="categories.js"></script>
+      <script src="blocks.js"></script>
+      <script src="legacy.js"></script>
+      <script src="sketch.js"></script>
+      <script src="views.js"></script>
+      <script src="sections/model.js"></script>
+      <script src="info/rates.js"></script>
+      <script src="info/sums.js"></script>
+      <script src="info/page.js"></script>
+    </template>
+    <script
+      src="boot.js"
+      onerror="
+        document.getElementById('info-said').textContent =
+          'The pad did not start: its first script did not load. Reload the page.'
+      "
+    ></script>
+  </body>
+</html>

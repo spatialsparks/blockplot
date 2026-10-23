@@ -1,0 +1,182 @@
+/* The small drawings of the toolbar's controls, on every page of the pad (ST-029): each a shape
+   said here, in this stylesheet, and drawn for this pad - no font, no set of icons from
+   anywhere and no file of a picture. A drawing is a mask, written out as text, over the colour
+   of its control's words: so it is white where the control is chosen and faint where it is off.
+   One family: a grid of 20, a line of 1.5 with round ends, and nothing filled but what must be.
+   A control keeps its word under its drawing; a drawing stands alone only on the five lesser
+   controls, which keep the names that are read out. Each page names this file after frame.css,
+   and the pad's server gives it as it gives that one. Where it is not given, or a browser
+   knows no mask, a control stands there with its word and no drawing. No gate counts its lines:
+   it stays under 300, counted by hand. */
+@supports ((mask-image: none) or (-webkit-mask-image: none)) {
+  /* How a drawing is drawn. It stands where a rule below gives it its picture, and its content. */
+  header button::before,
+  #views a::before {
+    flex: none;
+    width: 20px;
+    height: 20px;
+    background: currentColor;
+    -webkit-mask: var(--icon) center / contain no-repeat;
+    mask: var(--icon) center / contain no-repeat;
+  }
+  /* A lesser control says its drawing alone: its word is there to be read out, and not seen. */
+  #undo,
+  #redo,
+  #smaller,
+  #larger,
+  #fit {
+    font-size: 0;
+  }
+
+  /* File: a sheet with a folded corner. */
+  #file-menu::before {
+    content: '';
+    --icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d='M5 2.5h6.5l4 4v11H5zM11.5 2.5v4h4'/></svg>");
+  }
+
+  /* The seven views: a cube seen askew, the face that the view looks at filled - its top, the
+     side toward us and the one behind it, its front and its back - for 3D the bare cube, and
+     for Info, what the sketch adds up to, a table: its head, two rows and a column of names. */
+  #views a[href$='#top']::before {
+    content: '';
+    --icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d='M10 2.5l6.5 3.75v7.5L10 17.5l-6.5-3.75v-7.5zM10 10v7.5'/><path d='M10 2.5l6.5 3.75L10 10 3.5 6.25z' fill='black'/></svg>");
+  }
+  #views a[href$='#side']::before {
+    content: '';
+    --icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d='M10 2.5l6.5 3.75v7.5L10 17.5l-6.5-3.75v-7.5zM10 10l6.5-3.75'/><path d='M3.5 6.25L10 10v7.5l-6.5-3.75z' fill='black'/></svg>");
+  }
+  #views a[href$='#far']::before {
+    content: '';
+    --icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d='M10 2.5l6.5 3.75v7.5L10 17.5l-6.5-3.75v-7.5zM10 10l-6.5 3.75'/><path d='M10 2.5l6.5 3.75v7.5L10 10z' fill='black'/></svg>");
+  }
+  #views a[href$='#front']::before {
+    content: '';
+    --icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d='M10 2.5l6.5 3.75v7.5L10 17.5l-6.5-3.75v-7.5zM10 10L3.5 6.25'/><path d='M10 10l6.5-3.75v7.5L10 17.5z' fill='black'/></svg>");
+  }
+  #views a[href$='#back']::before {
+    content: '';
+    --icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d='M10 2.5l6.5 3.75v7.5L10 17.5l-6.5-3.75v-7.5zM10 10l6.5 3.75'/><path d='M10 2.5V10l-6.5 3.75v-7.5z' fill='black'/></svg>");
+  }
+  #views a[href$='3d.html']::before {
+    content: '';
+    --icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d='M10 2.5l6.5 3.75v7.5L10 17.5l-6.5-3.75v-7.5zM3.5 6.25L10 10l6.5-3.75M10 10v7.5'/></svg>");
+  }
+  #views a[href$='info.html']::before {
+    content: '';
+    --icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='3.5' width='14' height='13' rx='1.5'/><path d='M3 7.5h14M3 12h14M7.5 7.5v9'/></svg>");
+  }
+
+  /* The two that zoom: a plus and a minus. */
+  #larger::before {
+    content: '';
+    --icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d='M10 5v10M5 10h10'/></svg>");
+  }
+  #smaller::before {
+    content: '';
+    --icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d='M5 10h10'/></svg>");
+  }
+  /* Zoom to fit: the four corners of a frame. */
+  #fit::before {
+    content: '';
+    --icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d='M3.5 7.5v-4h4M12.5 3.5h4v4M16.5 12.5v4h-4M7.5 16.5h-4v-4'/></svg>");
+  }
+
+  /* Undo and Redo: an arrow bent back, and one bent on. */
+  #undo::before {
+    content: '';
+    --icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d='M7.5 5L4 8.5 7.5 12M4 8.5h8a3.75 3.75 0 0 1 0 7.5H9.5'/></svg>");
+  }
+  #redo::before {
+    content: '';
+    --icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d='M12.5 5L16 8.5 12.5 12M16 8.5H8a3.75 3.75 0 0 0 0 7.5h2.5'/></svg>");
+  }
+
+  /* The tools. Select: a pointer's arrow. Merge: two squares become one. Line: a slanting line
+     with a dot at each end. Label: a tag. Erase: a rubber on its line. */
+  button[data-tool='move']::before {
+    content: '';
+    --icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d='M5 3v12.5l3.4-2.9 2.2 4.6 2.1-1-2.2-4.5 4.5-.3z'/></svg>");
+  }
+  button[data-tool='merge']::before {
+    content: '';
+    --icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d='M3.5 3.5h8v5h5v8h-8v-5h-5z'/></svg>");
+  }
+  button[data-tool='line']::before {
+    content: '';
+    --icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><circle cx='4.5' cy='15.5' r='1.75'/><circle cx='15.5' cy='4.5' r='1.75'/><path d='M5.75 14.25l8.5-8.5'/></svg>");
+  }
+  button[data-tool='text']::before {
+    content: '';
+    --icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d='M2.75 10L7.5 4.5H17v11H7.5z'/><circle cx='8' cy='10' r='1'/></svg>");
+  }
+  button[data-tool='erase']::before {
+    content: '';
+    --icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d='M8.5 16.5l-5-5L11 4l5 5-7.5 7.5zM6.5 8.5l5 5M8.5 16.5H17'/></svg>");
+  }
+  /* The button of the Objects group has its object's picture: after its name, a small sign
+     that it opens something. */
+  #object-name::after {
+    content: '';
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    margin-left: 3px;
+    background: currentColor;
+    --icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d='M1.5 2.75L4 5.25l2.5-2.5'/></svg>");
+    -webkit-mask: var(--icon) center / contain no-repeat;
+    mask: var(--icon) center / contain no-repeat;
+  }
+
+  /* The three ways of 3D: a house filled, a house in outline, a house in two tones. */
+  button[data-way='volumes']::before {
+    content: '';
+    --icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d='M10 3l7 6v8H3V9z' fill='black'/></svg>");
+  }
+  button[data-way='white']::before {
+    content: '';
+    --icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d='M10 3l7 6v8H3V9z'/></svg>");
+  }
+  button[data-way='materials']::before {
+    content: '';
+    --icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d='M3 9h14v8H3z' fill='black' fill-opacity='.3'/><path d='M10 3l7 6H3z' fill='black'/></svg>");
+  }
+
+  /* The five stands: the house from above, a small square, with a mark on the side it is seen
+     from - the front below it, as one stands before a house - and for above a mark in it. */
+  button[data-stand='front']::before {
+    content: '';
+    --icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><rect x='6.25' y='2.25' width='7.5' height='7.5' rx='1'/><path d='M10 14.5l2.25 2.75h-4.5z' fill='black'/></svg>");
+  }
+  button[data-stand='back']::before {
+    content: '';
+    --icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><rect x='6.25' y='10.25' width='7.5' height='7.5' rx='1'/><path d='M10 5.5l-2.25-2.75h4.5z' fill='black'/></svg>");
+  }
+  button[data-stand='left']::before {
+    content: '';
+    --icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><rect x='10.25' y='6.25' width='7.5' height='7.5' rx='1'/><path d='M5.5 10l-2.75-2.25v4.5z' fill='black'/></svg>");
+  }
+  button[data-stand='right']::before {
+    content: '';
+    --icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><rect x='2.25' y='6.25' width='7.5' height='7.5' rx='1'/><path d='M14.5 10l2.75-2.25v4.5z' fill='black'/></svg>");
+  }
+  button[data-stand='above']::before {
+    content: '';
+    --icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><rect x='4.5' y='4.5' width='11' height='11' rx='1'/><circle cx='10' cy='10' r='1.25' fill='black'/></svg>");
+  }
+
+  /* Settings: three sliders. */
+  #settings-open::before {
+    content: '';
+    --icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d='M3 5.5h3M10 5.5h7M3 10h8M15 10h2M3 14.5h1.5M8.5 14.5H17'/><circle cx='8' cy='5.5' r='2'/><circle cx='13' cy='10' r='2'/><circle cx='6.5' cy='14.5' r='2'/></svg>");
+  }
+  /* Distances: an outline, and inside it another, dashed - a line kept from the boundary. */
+  #distances-open::before {
+    content: '';
+    --icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d='M3 5.5L7.5 2.75H17v14.5H3z'/><path d='M7 8l2-1.5h4.5v7H7z' stroke-dasharray='2 2'/></svg>");
+  }
+  /* Full screen: four corners, as of a screen. */
+  #full-screen::before {
+    content: '';
+    --icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d='M3 7.5V3h4.5M12.5 3H17v4.5M17 12.5V17h-4.5M7.5 17H3v-4.5'/></svg>");
+  }
+}

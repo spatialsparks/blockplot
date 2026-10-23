@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <!-- The page asks the address it came from - its files, its kept sketches - and no other (directive 34). -->
+    <meta http-equiv="Content-Security-Policy" content="connect-src 'self'" />
+    <title>Sketch pad</title>
+    <!-- The stylesheets, each by its bare name, so that the page finds them from its file too:
+         the frame, which this page shares with 3d.html - the toolbar, a control, a side, and
+         the one look of both; what this page alone has - the paper, the alarm, the layers, the
+         gallery (pad.css); the colours, the toolbar's palette and the swatch's (colours.css);
+         the small drawings of the toolbar's controls, shared too; then the boundary distances'
+         panel and the right button's menu. -->
+    <link rel="stylesheet" href="frame.css" />
+    <link rel="stylesheet" href="pad.css" />
+    <link rel="stylesheet" href="colours.css" />
+    <link rel="stylesheet" href="lines/lines.css" />
+    <link rel="stylesheet" href="icons.css" />
+    <link rel="stylesheet" href="distances/distances.css" />
+    <link rel="stylesheet" href="right-menu.css" />
+  </head>
+  <body>
+    <!-- The toolbar: five groups, each a direct child of it and named by its label, which
+         frame.css writes over it - after them Distances, in none, and the words that name the
+         plot or the slice. -->
+    <header>
+      <!-- File is a menu: one button, which says its own name - so its group has no word over
+           it - and opens the entries (views.js). kept.js puts "Open kept" and "Keep",
+           and open-plot.js "Open plot", there. -->
+      <span class="group" id="file-group" role="group" aria-labelledby="file-menu">
+        <button type="button" id="file-menu" aria-expanded="false" aria-controls="file-entries">
+          File
+        </button>
+        <span class="menu" id="file-entries" hidden>
+          <button type="button" id="open">Open file</button>
+          <button type="button" id="save" title="The whole sketch, all its views, as one file">
+            Save file
+          </button>
+          <small>Export</small>
+          <button type="button" id="picture" title="The paper as it shows, as a PNG image">
+            Picture (PNG)
+          </button>
+        </span>
+        <input type="file" id="file" accept=".json,application/json" hidden />
+      </span>
+      <span class="group" id="view-group" role="group" aria-label="View">
+        <nav class="group" id="views"></nav>
+        <button type="button" id="smaller" title="Zoom out (Ctrl+wheel)" aria-label="Zoom out">
+          −
+        </button>
+        <button type="button" id="larger" title="Zoom in (Ctrl+wheel)" aria-label="Zoom in">
+          +
+        </button>
+        <button
+          type="button"
+          id="fit"
+          title="Zoom to fit: the plot and all that is drawn in the window. The wheel moves the paper, and so does the middle button, or Space held, dragged"
+          aria-label="Zoom to fit"
+        >
+          ⤢
+        </button>
+      </span>
+      <span class="group" id="edit-group" role="group" aria-label="Edit">
+        <button type="button" id="undo" title="Ctrl+Z">Undo</button>
+        <button type="button" id="redo" title="Ctrl+Y">Redo</button>
+        <button
+          type="button"
+          data-tool="move"
+          title="Click a block or an object to select it and see how large it is. Drag it to move it, or an edge or a corner of a box to resize it; with Ctrl held down, a copy is moved. With Shift held down, in any view but the top view, a top corner of a box dragged down slopes its top, and dragged back up makes it level again. In the top view an end, a side or a corner of an object is dragged to the size it is to have, where its kind allows. Delete or Backspace erases what is selected; the right mouse button opens a menu of the block or the object it is pressed on. The colour of the selected block stands right of the paper, and is changed there; R turns the selected object by a quarter. In the top view it also drags the lines of the two slices (S or M)"
+        >
+          Select
+        </button>
+        <button
+          type="button"
+          data-tool="merge"
+          title="Drag a box over blocks to make one block of them (G)"
+        >
+          Merge
+        </button>
+        <button type="button" data-tool="line" title="Click corners; Alt off grid; Enter ends (L)">
+          Line
+        </button>
+        <button type="button" data-tool="text" title="Name a block, or label the paper (T)">
+          Label
+        </button>
+        <button
+          type="button"
+          data-tool="erase"
+          title="Click a thing to take it away, or drag a box: it is cut out of the blocks it reaches into (E)"
+        >
+          Erase
+        </button>
+      </span>
+      <!-- A colour is the Block tool (palette.js): there is no button for it. -->
+      <span class="group" id="block-group" role="group" aria-label="Block">
+        <label
+          id="high-row"
+          title="How high a block drawn here is: its floor is the level drawn on. A height set here takes the Block tool, in the colour picked last"
+        >
+          <input type="number" id="high" min="0.5" max="30" step="0.5" value="3" size="4" />
+          m high
+        </label>
+        <span class="group" id="palette" role="group" aria-label="Colour"></span>
+      </span>
+      <!-- One button, which is the Object tool and shows the object that a click sets down: its
+           picture and its name, which gallery.js writes. The objects to pick from are the
+           gallery, right of the paper while Object is the tool. -->
+      <span class="group" id="objects-group" role="group" aria-label="Objects">
+        <button
+          type="button"
+          id="object"
+          data-tool="object"
+          title="Set down an object with a click on the paper: pick it in the gallery right of the paper, and turn it by a quarter with R before you click (O)"
+        >
+          <canvas id="object-picture" width="18" height="18" aria-hidden="true"></canvas>
+          <span id="object-name"></span>
+        </button>
+      </span>
+      <!-- Distances: the button opens the boundary distances, at the top of the right side, and
+           shuts them again (distances/panel.js). It stands in no group, as Settings in 3D. -->
+      <button
+        type="button"
+        id="distances-open"
+        title="Boundary distances: lines inside the plot, as far from its outline as you type"
+        aria-expanded="false"
+        aria-controls="distances"
+      >
+        Distances
+      </button>
+      <strong id="title"></strong>
+    </header>
+    <p id="alarm" role="alert"></p>
+    <div id="work">
+      <aside id="left" aria-labelledby="layers-title">
+        <h2 id="layers-title"></h2>
+        <p class="group" id="level-tools">
+          <button type="button" id="add" title="A level at a height you give, to draw on">
+            New level
+          </button>
+          <button type="button" id="remove" title="The layer drawn on, with all that stands on it">
+            Delete
+          </button>
+        </p>
+        <ul id="layers" title="Page Up and Page Down go from layer to layer"></ul>
+        <div id="cut-tools">
+          <p id="cut-at"></p>
+          <p class="group">
+            <button
+              type="button"
+              id="nearer"
+              title="The slice a cell nearer (Page Down)"
+              aria-label="The slice a cell nearer"
+            >
+              ◀
+            </button>
+            <input
+              type="range"
+              id="cut"
+              min="0"
+              step="1"
+              aria-label="Where the slice runs, from the side this view looks from to the far one"
+            />
+            <button
+              type="button"
+              id="farther"
+              title="The slice a cell further (Page Up)"
+              aria-label="The slice a cell further"
+            >
+              ▶
+            </button>
+          </p>
+        </div>
+        <p id="layers-hint"></p>
+      </aside>
+      <main id="scroller"><canvas id="paper" role="img"></canvas></main>
+      <!-- What is selected: page.js writes the pad's words of it, and category-list.js puts its
+           row right after them. Always there and as wide: the paper lies where it lay. After it
+           gallery.js puts the gallery, which shows in its place while Object is the tool. -->
+      <aside id="right">
+        <!-- The boundary distances, opened by their button: panel.js makes a row for each. -->
+        <section id="distances" aria-labelledby="distances-title" hidden>
+          <h2 id="distances-title">Boundary distances</h2>
+          <ul id="distance-fields"></ul>
+          <label id="distances-switch">
+            <input type="checkbox" id="distances-shown" checked />
+            Show the lines
+          </label>
+          <p>
+            Drawn from above, at every level. The pad holds no zone's figures: type your zone's.
+          </p>
+        </section>
+        <section id="selected" aria-label="What is selected">
+          <p id="picked" aria-live="polite" hidden></p>
+          <p id="none-picked">Nothing is selected.</p>
+        </section>
+      </aside>
+    </div>
+    <footer>
+      <span id="status">Move over the paper to measure.</span>
+      <span id="areas"></span>
+      <span id="credit"></span>
+    </footer>
+    <template id="scripts">
+      <script src="site.js"></script>
+      <script src="squares.js"></script>
+      <script src="windows.js"></script>
+      <script src="paper.js"></script>
+      <script src="grid.js"></script>
+      <script src="figures.js"></script>
+      <script src="shapes.js"></script>
+      <script src="stairs.js"></script>
+      <script src="kitchen.js"></script>
+      <script src="bathroom.js"></script>
+      <script src="garden.js"></script>
+      <script src="furniture.js"></script>
+      <script src="object-groups.js"></script>
+      <script src="categories.js"></script>
+      <script src="blocks.js"></script>
+      <script src="earth.js"></script>
+      <script src="land.js"></script>
+      <script src="draw.js"></script>
+      <script src="draw-marks.js"></script>
+      <script src="legacy.js"></script>
+      <script src="sketch.js"></script>
+      <script src="sections/model.js"></script>
+      <script src="own-colours.js"></script>
+      <script src="lines/model.js"></script>
+      <script src="strokes.js"></script>
+      <script src="slopes.js"></script>
+      <script src="stretch.js"></script>
+      <script src="levels.js"></script>
+      <script src="labels.js"></script>
+      <script src="selected.js"></script>
+      <script src="layers.js"></script>
+      <script src="footer.js"></script>
+      <script src="files.js"></script>
+      <script src="kept-ways.js"></script>
+      <script src="kept.js"></script>
+      <script src="open-plot.js"></script>
+      <script src="open-plot-ways.js"></script>
+      <script src="views.js"></script>
+      <script src="category-list.js"></script>
+      <script src="swatch.js"></script>
+      <script src="palette.js"></script>
+      <script src="object-high.js"></script>
+      <script src="gallery.js"></script>
+      <script src="sections/list.js"></script>
+      <script src="distances/model.js"></script>
+      <script src="distances/lines.js"></script>
+      <script src="distances/panel.js"></script>
+      <script src="zoom.js"></script>
+      <script src="pointer.js"></script>
+      <script src="lines/tool.js"></script>
+      <script src="lines/panel.js"></script>
+      <script src="lines/list.js"></script>
+      <script src="right-menu.js"></script>
+      <script src="page.js"></script>
+    </template>
+    <script
+      src="boot.js"
+      onerror="
+        document.getElementById('alarm').textContent =
+          'The pad did not start: its first script did not load. Reload the page.'
+      "
+    ></script>
+  </body>
+</html>

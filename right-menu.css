@@ -1,0 +1,24 @@
+/* The right button's menu (right-menu.js, T-037.5): the look of a menu (frame.css, `.menu`),
+   at a place of the window that the script sets - where the paper was pressed - and not under
+   a button. The list of an entry stands beside it. A menu or a list longer than the window
+   scrolls within it. index.html names this file after its other stylesheets; no gate counts
+   its lines. */
+.right-menu,
+.right-list {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 20;
+  max-height: 100vh;
+  overflow-y: auto;
+}
+/* The entry that stands for what is now: the level it stands on, its section, its category. */
+.right-menu [aria-checked='true']::before {
+  content: '✓ ';
+}
+/* Why an entry is off stands right under it, with no hairline of a group over it. */
+.right-menu button + small.why {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+}

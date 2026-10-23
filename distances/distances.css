@@ -1,0 +1,49 @@
+/* The look of the boundary distances (ST-036, T-036.3): their panel at the top of the right side
+   of the pad's page, in the look of a side (frame.css) - a small faint heading, rows without
+   lines between them - with a short line in each distance's colour beside its field and, in the
+   pad's red, why what was typed is not taken. The toolbar's button is frame.css's, its drawing
+   icons.css's. No figure of any zone stands here. No gate counts its lines: it stays under 300,
+   counted by hand. */
+#distances {
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--hair);
+}
+#distance-fields li {
+  padding: 6px 0 8px;
+}
+#distance-fields label,
+#distance-fields small {
+  display: block;
+}
+#distance-fields .group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 4px 0 2px;
+}
+#distance-fields input {
+  width: 4.5em;
+}
+/* The colour of the distance's line: a short line, as thin as a line on the paper is wide. */
+#distance-fields .colour {
+  width: 24px;
+  height: 2px;
+  margin-left: auto;
+}
+#distance-fields small {
+  margin: 2px 0;
+}
+#distances .refused {
+  color: #b91c1c;
+  font-weight: 600;
+}
+#distances .refused:empty {
+  display: none;
+}
+#distances-switch {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 4px 0;
+  font-size: 12px;
+}

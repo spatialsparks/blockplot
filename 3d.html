@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <!-- The page asks nothing of any machine, this one included (directive 34). -->
+    <meta http-equiv="Content-Security-Policy" content="connect-src 'none'" />
+    <title>Sketch pad</title>
+    <!-- The frame, which this page shares with index.html: the toolbar, a control, a side, and
+         the one look of both. A line of the toolbar is a whole number of pixels high there: the
+         stage begins on a pixel of the screen, however many lines stand over it. And after it
+         the small drawings of the toolbar's controls, shared too. -->
+    <link rel="stylesheet" href="frame.css" />
+    <link rel="stylesheet" href="icons.css" />
+    <!-- What this page alone has: the two switches, how wide its two sides are, the levels, the
+         stage, and the page's line of words - and in side.css the switches of what shows, the
+         figures, File's Google Earth rows, and the stage alone, full screen. The look is
+         frame.css's: its custom properties, and its rules - the ways and the stands each stand
+         in a track there. -->
+    <style>
+      /* The toolbar's tail: the switch of the ground and the switch of the shadows, which a way
+         may have no use for - it is then not seen, and keeps its place (`away`, frame.css). */
+      #with {
+        column-gap: 16px;
+        padding: 0 6px;
+      }
+      #with label {
+        gap: 6px;
+      }
+      #with input {
+        margin: 0;
+      }
+      /* A way is a square a little wider than the others: "Materials" is one long word. */
+      #ways > button {
+        width: 56px;
+      }
+      /* Left of the stage, the levels: as the pad's layers lie left of its paper, and narrower. */
+      #side {
+        width: 200px;
+        border-right: 1px solid var(--hair);
+      }
+      /* Right of the stage, the figures of the house, once Settings open them: that room is the
+         stage's, which is so much narrower while they are open and has it back when they shut. */
+      #settings {
+        width: 260px;
+        border-left: 1px solid var(--hair);
+      }
+      /* A level is one row, and the one that shows has the ink (frame.css). */
+      #levels button {
+        width: 100%;
+        height: 30px;
+        margin-bottom: 2px;
+        text-align: left;
+        white-space: nowrap;
+      }
+      /* The stage fills what the header, the page's words, the levels and - while they are open -
+         the figures leave, and its canvas fills it. */
+      #stage {
+        flex: 1;
+        min-width: 0;
+        position: relative;
+        overflow: hidden;
+      }
+      #stage canvas {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+      }
+      /* What the page says in words, and nothing until its script says what. Where nothing could
+         be drawn, that is all there is: in the middle of the page. */
+      #said {
+        display: none;
+        max-width: 60ch;
+        margin: 15vh auto 0;
+        padding: 0 16px;
+        text-align: center;
+        font-size: 15px;
+        color: var(--faint);
+      }
+      body[data-stage='none'] #said {
+        display: block;
+      }
+      /* Where there is a stage, the words have a line of their own between the header and the
+         stage, as the pad's alarm has, and cover nothing of it: a quiet line where nothing is
+         drawn yet, the pad's red where something went wrong. No words, no line. */
+      #said.line {
+        display: block;
+        max-width: none;
+        margin: 0;
+        padding: 6px 10px;
+        text-align: left;
+        font-size: inherit;
+        line-height: 18px;
+        background: var(--paper);
+        border-bottom: 1px solid var(--hair);
+      }
+      #said.trouble {
+        background: #b91c1c;
+        color: #fff;
+        font-weight: 600;
+      }
+    </style>
+    <link rel="stylesheet" href="view3d/side.css" />
+    <!-- three.js lies beside the pages, in a folder three/: what a script imports as `three`,
+         or as an addon of it, comes from there, from where this page is, and from nowhere else -
+         so the pad runs under any path. pnpm sketch gives the installed package there. -->
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "./three/build/three.module.js",
+          "three/addons/": "./three/examples/jsm/"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <!-- The toolbar: File and View first, where the pad's own page has them, then this page's
+         groups - each a direct child of it and named by its label, which frame.css writes over
+         it - then the buttons of Settings and of Full screen, and last the words that name the
+         plot. The controls of the stage, here and beside it: view3d/panel.js fills them, and
+         shows them where there is a stage. -->
+    <header>
+      <!-- File is a menu, as on the pad's own page: one button, which opens the entries
+           (views.js). Until there is a stage it is not seen, and keeps its place: the switch of
+           views stands where the pad has it. The picture is the stage as it shows, in whichever
+           way, saved as a PNG (view3d/stage.js, view3d/file.js). The 3D file is the parts of the
+           house as they stand, saved as one file (view3d/file.js): its entry is on where the way
+           shows the house as its parts, and off elsewhere, with the line under it that says why.
+           What that entry says of itself, panel.js says here. The Google Earth file is the
+           house as White builds it, above the ground, at the plot, less what is switched off
+           (kml/house.js), on in every way and off where the plot says no place, with the raise
+           under it, typed and kept for the plot. -->
+      <span class="group away" id="file-group" role="group" aria-labelledby="file-menu">
+        <button type="button" id="file-menu" aria-expanded="false" aria-controls="file-entries">
+          File
+        </button>
+        <span class="menu" id="file-entries" hidden>
+          <small>Export</small>
+          <button
+            type="button"
+            id="picture"
+            title="The stage as it shows, as a picture: a pixel of it for each of the screen's"
+          >
+            Picture (PNG)
+          </button>
+          <button type="button" id="save" disabled>3D file (GLB)</button>
+          <small id="save-why" hidden>
+            The Volumes show no part of a house: White and Materials do.
+          </small>
+          <button
+            type="button"
+            id="earth"
+            title="The house as White builds it — walls, floors, roofs, railings and panes — above the ground, at the plot, less what is switched off, as a file that Google Earth opens"
+          >
+            Google Earth file (KML)
+          </button>
+          <small id="earth-why" hidden>
+            This plot does not say where it lies in the national grid, so it makes no Google Earth
+            file.
+          </small>
+          <label id="earth-row">
+            Raise in Google Earth
+            <input type="text" id="earth-raise" inputmode="decimal" size="5" />
+            m — tuned by eye
+          </label>
+        </span>
+      </span>
+      <!-- The switch is the pad's, views.js: the page tells it here that it is the sixth view. -->
+      <span class="group" id="view-group" role="group" aria-label="View">
+        <nav class="group" id="views" data-view="3d"></nav>
+      </span>
+      <span class="group" id="ways" role="group" aria-label="Shown as" hidden></span>
+      <span class="group" id="stands" role="group" aria-label="Seen from" hidden></span>
+      <!-- The tail is one group: the switch of the ground stands on a line with the one that a
+           way may have no use for, so no line is empty where that one is not seen. -->
+      <span class="group tail" id="with" role="group" aria-label="With" hidden>
+        <label
+          class="group"
+          id="ground-row"
+          title="The ground of the plot, with its outline: off, what lies under it shows"
+          hidden
+        >
+          <input type="checkbox" id="ground" checked />
+          Ground
+        </label>
+        <!-- Shown where the way has a sun to cast them; what the sun is, panel.js says here. -->
+        <label class="group" id="shadows-row" hidden>
+          <input type="checkbox" id="shadows" checked />
+          Shadows
+        </label>
+      </span>
+      <!-- Settings: the button opens the figures the house is built with, right of the stage,
+           and shuts them again (view3d/settings.js). No other text of the page says the
+           button's word: a look finds it by that. -->
+      <button
+        type="button"
+        id="settings-open"
+        title="The figures the house is built with: how thick a wall is, how high a door"
+        aria-expanded="false"
+        aria-controls="settings"
+        hidden
+      >
+        Settings
+      </button>
+      <!-- Full screen: the stage alone, with a picture and back in its corner (view3d/full.js). -->
+      <button
+        type="button"
+        id="full-screen"
+        title="The stage alone, filling the screen: Escape, or Back in its corner, is back"
+        hidden
+      >
+        Full screen
+      </button>
+      <strong id="title"></strong>
+    </header>
+    <!-- Until view3d/main.js says otherwise, what holds where it did not load: the page was
+         opened from a file, three.js is not installed, or the pad that runs is an older one. -->
+    <p id="said" role="status">
+      The 3D view did not load. It comes from the pad's own server, with three.js installed: run
+      pnpm install, stop the pad if it runs, start it again with pnpm sketch, and open the view from
+      there.
+    </p>
+    <div id="work">
+      <!-- Left of the stage, the levels to cut the scene at: view3d/panel.js lists them. -->
+      <aside id="side" aria-labelledby="levels-title" hidden>
+        <h2 id="levels-title">Levels</h2>
+        <ul id="levels" title="Page Up and Page Down go from level to level"></ul>
+        <p>
+          A level shows what stands on it and what stands below it, whole. All that stands higher is
+          taken off. In White and in Materials the storey it stops at has no roof either: its rooms
+          show from above.
+        </p>
+        <!-- Under them, what shows: a switch a section and a group of objects (view3d/switches.js). -->
+        <div id="switches">
+          <h2 id="switch-sections-title">Sections</h2>
+          <ul id="switch-sections" aria-labelledby="switch-sections-title"></ul>
+          <p id="switch-sections-none" hidden>The pad's page makes sections.</p>
+          <h2 id="switch-objects-title">Objects</h2>
+          <ul id="switch-objects" aria-labelledby="switch-objects-title"></ul>
+        </div>
+      </aside>
+      <main id="stage"></main>
+      <!-- Right of the stage, the figures the house is built with: view3d/settings.js lists
+           them here, each with its field, and the button of the toolbar opens the list. -->
+      <aside id="settings" aria-labelledby="settings-open" hidden>
+        <p id="settings-said" role="status" hidden></p>
+        <ul id="figures"></ul>
+        <p>
+          Each holds for the whole house, and is kept in the sketch as it is typed: White and
+          Materials show the house built with it. Undo, in any of the five other views, takes one
+          back.
+        </p>
+      </aside>
+    </div>
+    <!-- The scripts of the pad that read the sketch, and its switch of views; then the sections. -->
+    <template id="scripts">
+      <script src="site.js"></script>
+      <script src="squares.js"></script>
+      <script src="windows.js"></script>
+      <script src="paper.js"></script>
+      <script src="figures.js"></script>
+      <script src="shapes.js"></script>
+      <script src="object-groups.js"></script>
+      <script src="categories.js"></script>
+      <script src="blocks.js"></script>
+      <script src="earth.js"></script>
+      <script src="legacy.js"></script>
+      <script src="sketch.js"></script>
+      <script src="views.js"></script>
+      <script src="sections/model.js"></script>
+      <!-- A module that does not load runs nothing: the page says so itself. -->
+      <script
+        type="module"
+        src="view3d/main.js"
+        onerror="document.body.dataset.stage = 'none'"
+      ></script>
+    </template>
+    <script src="boot.js" onerror="document.body.dataset.stage = 'none'"></script>
+  </body>
+</html>

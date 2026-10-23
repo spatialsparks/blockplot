@@ -1,0 +1,286 @@
+/* What the pad's own page has and 3d.html has not: the lesser controls of its toolbar, the row
+   of the selected block's colour - the colours themselves are colours.css's - the button of the
+   Objects group, the alarm, the paper, the two sides with what stands in them - the levels,
+   what is selected, the gallery of the objects - and the footer.
+   index.html names this file in the line after frame.css, which holds what the two pages share
+   and the look that the rules here take: its custom properties. The pad's server gives it as
+   it gives that one (routes.js); opened from its file, the page finds it beside itself. No
+   gate counts its lines: it stays under 300, counted by hand. */
+/* A lesser control is small, 24 pixels, one over the other, and says its drawing alone
+   (icons.css): Undo over Redo, and the two that zoom, the larger over the smaller - and after
+   them Zoom to fit, between the two rows. */
+#undo,
+#redo,
+#smaller,
+#larger,
+#fit {
+  flex-direction: row;
+  justify-content: center;
+  gap: 0;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+}
+#undo,
+#larger {
+  grid-row: 1;
+  align-self: end;
+}
+#redo,
+#smaller {
+  grid-row: 2;
+  align-self: start;
+}
+#fit {
+  grid-row: 1 / 3;
+  align-self: center;
+}
+/* The Block group: how high a block is, a quiet band with its words after it, and the colours
+   - round, the eleven in two rows, the one drawn in with a ring in the ink and white between. */
+#block-group {
+  column-gap: 10px;
+}
+#high-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+#high {
+  width: 3.8em;
+  padding-right: 2px;
+}
+/* The colour of the selected block and its name (swatch.js): its colours hang from the row,
+   a panel that floats, in two rows as the toolbar's stand. */
+#swatch-row {
+  position: relative;
+  display: flex;
+  gap: 8px;
+  padding: 10px 6px 0;
+}
+#alarm {
+  margin: 0;
+  padding: 6px 10px;
+  background: #b91c1c;
+  color: #fff;
+  font-weight: 600;
+}
+#alarm:empty {
+  display: none;
+}
+/* A button of the alarm has ink for its words (files.js): so it keeps a white ground there. */
+:where(#alarm) button {
+  background: var(--paper);
+}
+/* The paper is a window (zoom.js): its canvas fills the place between the two sides, and moves
+   what it shows instead of scrolling. */
+main {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+canvas {
+  display: block;
+  cursor: crosshair;
+}
+main > canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+/* Left of the paper where one draws and what shows, right of it what is selected: each with
+   its line toward the paper, and the right one as wide whatever is selected. */
+#left {
+  width: 256px;
+  border-right: 1px solid var(--hair);
+}
+#right {
+  width: 260px;
+  border-left: 1px solid var(--hair);
+}
+aside small {
+  margin: 6px 0;
+  color: var(--faint);
+  font-size: 12px;
+}
+#cut {
+  flex: 1;
+  min-width: 0;
+}
+/* What is selected, in a few short rows: the pad's words of it, its category, its colour -
+   and where nothing is, a line that says so. */
+#picked {
+  margin: 6px 0 10px;
+  padding: 0 6px;
+  color: var(--ink);
+  font-size: 13px;
+}
+#category-row,
+#swatch-row,
+#object-high-row,
+#section-row {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid var(--hair);
+}
+#category-said {
+  margin: 4px 6px 0;
+}
+#none-picked {
+  display: none;
+}
+#picked[hidden] ~ #none-picked {
+  display: block;
+}
+/* A layer is one row, and so is a section: its name - to draw on it, or to pick it - over what
+   is on it; a quiet word; and the two arrows of a level or a section, quiet until pointed at. */
+:is(#layers, #sections) li {
+  display: grid;
+  grid-template: 24px 20px / minmax(0, 1fr) auto 20px 20px;
+  align-items: center;
+  column-gap: 2px;
+  margin-bottom: 2px;
+  border-radius: 6px;
+}
+:is(#layers, #sections) li > button {
+  grid-row: 1;
+}
+:is(#layers, #sections) li > :first-child {
+  grid-area: 1 / 1 / 3 / 2;
+  align-self: stretch;
+  padding: 3px 8px 23px;
+  overflow: hidden;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+:is(#layers, #sections) small {
+  grid-area: 2 / 1 / 3 / -1;
+  align-self: start;
+  margin: 0;
+  padding: 0 8px;
+  line-height: 16px;
+  white-space: nowrap;
+  pointer-events: none;
+}
+:is(#layers, #sections) li > :nth-child(2) {
+  padding: 3px 6px;
+  color: var(--faint);
+  font-size: 12px;
+}
+:is(#layers, #sections) li > [aria-label] {
+  width: 20px;
+  height: 24px;
+  padding: 0;
+  color: var(--off);
+  font-size: 9px;
+}
+:is(#layers, #sections) li:hover > [aria-label],
+:is(#layers, #sections) li:focus-within > [aria-label] {
+  color: inherit;
+}
+/* The level drawn on, and the section picked, have the ink: the whole row, white words, quiet. */
+:is(#layers, #sections) li:has(> [aria-pressed='true']) {
+  --over: rgb(255 255 255 / 0.16);
+  --off: rgb(255 255 255 / 0.5);
+  background: var(--ink);
+  color: #fff;
+}
+:is(#layers, #sections) li:has(> [aria-pressed='true']) > :is(small, :nth-child(2)) {
+  color: #c5ccd3;
+}
+:is(#layers, #sections) li:has(> [aria-pressed='true']) :focus-visible {
+  outline-color: #fff;
+  outline-offset: -3px;
+}
+footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 16px;
+  padding: 6px 10px;
+  background: var(--paper);
+  border-top: 1px solid var(--hair);
+  font-size: 12px;
+}
+#areas i {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-left: 8px;
+}
+#credit {
+  margin-left: auto;
+  color: var(--faint);
+}
+/* The button of the Objects group (gallery.js): a square like the others, and wider - the
+   picture of the object that a click sets down where the others have a drawing, its name, and
+   a small sign that it opens something (icons.css). It is as wide for every kind, so that the
+   toolbar does not move when another is picked, and a name that has no room in two lines is cut
+   short. A picture is drawn in the paper's ink, and stands on the paper's white - where its
+   button shows pressed, too. */
+#object {
+  width: 104px;
+}
+#object-name {
+  display: -webkit-box;
+  max-width: 100%;
+  padding: 0 4px;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+#object-picture,
+#gallery canvas {
+  flex: none;
+  background: var(--paper);
+  cursor: inherit;
+}
+#object-picture {
+  width: 20px;
+  height: 20px;
+  padding: 1px;
+  border-radius: 4px;
+}
+/* The gallery of the objects (gallery.js), right of the paper while Object is the tool, in the
+   place of what is selected: a heading a group, and under it a tile a kind. It scrolls with
+   its side, and a heading stays in sight over its group's tiles while they are scrolled
+   through: it sticks to the top edge of the side, over the side's own 8 pixels of padding
+   (frame.css), so that no tile shows above it. */
+#gallery section {
+  margin-bottom: 8px;
+}
+#gallery h2 {
+  position: sticky;
+  top: -8px;
+  margin: 0;
+  padding: 8px 6px 4px;
+  background: var(--paper);
+}
+/* A tile is a quiet row: the picture, 44 pixels square, and beside it the name over the size.
+   The picked one lies in a band of the light grey, with a mark of the ink at its edge. */
+#gallery button {
+  display: grid;
+  grid-template-columns: 44px 1fr;
+  align-items: center;
+  column-gap: 10px;
+  width: 100%;
+  margin-bottom: 2px;
+  padding: 4px 6px 4px 8px;
+  text-align: left;
+}
+#gallery button[aria-pressed='true'] {
+  background: linear-gradient(var(--ink), var(--ink)) left / 3px 24px no-repeat var(--grey);
+  color: inherit;
+}
+#gallery canvas {
+  grid-row: 1 / 3;
+  width: 44px;
+  height: 44px;
+  border-radius: 4px;
+}
+#gallery small {
+  margin: 0;
+}

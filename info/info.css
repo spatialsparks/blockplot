@@ -1,0 +1,142 @@
+/* The look of the Info page (ST-032, T-032.5): what this page alone has - its line of words, the
+   page itself, the rates and the tables - in the pad's one look, whose figures are the custom
+   properties of frame.css. The toolbar and a control are frame.css's, their drawings icons.css's.
+   No gate counts its lines: it stays under 300, counted by hand. */
+
+/* The page's own words: a line of their own between the toolbar and the page, in the pad's red,
+   for all it says is what went wrong - the page did not load, the sketch cannot be read, a rate
+   was not kept. Nothing to say, no line. */
+#info-said {
+  margin: 0;
+  padding: 6px 10px;
+  line-height: 18px;
+  background: #b91c1c;
+  color: #fff;
+  font-weight: 600;
+}
+
+/* Under the toolbar the page itself, on the paper: it scrolls for itself, both ways, and what it
+   holds keeps to a width that reads. */
+#info {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 18px 24px 32px;
+  background: var(--paper);
+}
+#info > * {
+  max-width: 62rem;
+}
+#info p {
+  margin: 0 0 10px;
+  color: var(--faint);
+}
+/* The whole house, in one line: the first thing to read, and the largest. */
+#info #info-house {
+  margin-bottom: 6px;
+  font-size: 16px;
+  color: var(--ink);
+}
+#info #info-none {
+  font-size: 15px;
+}
+
+/* A heading and a caption are quiet, as a side's heading is: small and faint. */
+#info h2,
+#info caption {
+  margin: 0 0 6px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 16px;
+  text-align: left;
+  color: var(--faint);
+}
+
+/* The rates: a row each, its words, then "CHF" and its field; under the field, in the pad's red,
+   why a text was not taken. The sentence under them says what each multiplies. */
+#info-rates {
+  margin: 22px 0 8px;
+}
+#rates {
+  display: grid;
+  grid-template-columns: max-content max-content;
+  gap: 4px 16px;
+  align-items: center;
+  margin: 0 0 8px;
+  padding: 0;
+  list-style: none;
+}
+#rates li {
+  display: contents;
+}
+#rates small {
+  grid-column: 2;
+}
+.rate {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+.rate input {
+  width: 7em;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.refused {
+  display: block;
+  max-width: 28em;
+  padding: 2px 0 4px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: normal;
+  color: #b91c1c;
+}
+input:disabled {
+  color: var(--off);
+}
+
+/* A table: the names left, the figures right, in figures of one width, so that a column reads
+   down; a hairline under every row, and the total under a line of the ink. */
+#info table {
+  margin: 22px 0 8px;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+#info th,
+#info td {
+  padding: 5px 0 5px 28px;
+  text-align: right;
+  vertical-align: baseline;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--hair);
+}
+#info th:first-child {
+  padding-left: 0;
+  text-align: left;
+  font-weight: 400;
+}
+#info tr:first-of-type th {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--faint);
+}
+/* The three tables have one width for each column, where what they hold leaves them room: so a
+   column of one stands under the same column of the other. */
+#info tr:first-of-type th:first-child {
+  width: 10rem;
+}
+#info tr:first-of-type th:is(:nth-child(2), :nth-child(3), :nth-child(4)) {
+  width: 6.5rem;
+}
+#info tr:first-of-type th:nth-child(5) {
+  width: 9rem;
+}
+#info tr.total > * {
+  font-weight: 600;
+  border-top: 1px solid var(--ink);
+  border-bottom: 0;
+}
+#info td .refused {
+  text-align: left;
+}

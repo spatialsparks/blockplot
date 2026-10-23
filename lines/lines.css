@@ -1,0 +1,67 @@
+/* The look of a selected line's panel and of the lines on every level (ST-039, T-039.4): the panel
+   in what is selected right of the paper, after the swatch's row, with a hair over it as the
+   swatch's row has (pad.css) - its two boxes in a row, a row a segment, `1 to 2` and its two
+   fields, and in the pad's red why what was typed is not taken; and left of the paper, under the
+   levels, the lines on every level, a quiet button each, the one selected in the ink. No gate
+   counts its lines: it stays under 300, counted by hand. */
+#line-row {
+  margin-top: 10px;
+  padding: 8px 6px 0;
+  border-top: 1px solid var(--hair);
+}
+#line-levels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  margin: 0 0 6px;
+}
+#line-levels label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+#segments {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+#segments li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 0;
+}
+#segments li > span {
+  min-width: 3.5em;
+  color: var(--faint);
+}
+#segments input {
+  width: 4.5em;
+}
+#segments .refused {
+  flex-basis: 100%;
+  color: #b91c1c;
+  font-weight: 600;
+}
+#segments .refused:empty {
+  display: none;
+}
+#every-lines {
+  margin: 8px 0;
+}
+#every-lines button {
+  display: block;
+  width: 100%;
+  margin-bottom: 2px;
+  padding: 3px 8px;
+  overflow: hidden;
+  border-radius: 6px;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+#every-lines button[aria-current='true'] {
+  background: var(--ink);
+  color: #fff;
+}
