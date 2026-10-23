@@ -33,6 +33,12 @@ web carries: its address, the browser's own `Origin` — the address the pad was
 no path — and, as every server sees, the internet address of your connection. The pad
 keeps nothing of the map: no picture is stored by it, and none is sent on.
 
+**A GeoJSON file you give New plot never leaves your browser.** Chosen or pasted under "From a
+file", it is read in the page, and nothing of it is sent to swisstopo or to anybody else, or
+kept in the browser's store: not its name, its properties or its text. Its corners alone go into
+the plot, and the ground under them is asked for as it is for any plot — which tells swisstopo
+where the plot lies, as above.
+
 ## What you draw never leaves your browser
 
 A plot and its sketches are kept on your computer, and nothing of them is sent anywhere:

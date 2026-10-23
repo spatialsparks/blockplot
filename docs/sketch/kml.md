@@ -3,7 +3,7 @@
 The Google Earth file (ST-016): what the sketch adds up to, at the plot, in a file that Google
 Earth opens on the web, on the phone and on the desktop — since ST-038 the house as the 3D
 page's White builds it, in plain white faces. The pad's one conversion from LV95 to
-WGS84, its one writer of KML text, and the test file — one box on a plot, by a command — which
+WGS84, and since ST-045 the one back, for New plot's reader of a GeoJSON file; its one writer of KML text, and the test file — one box on a plot, by a command — which
 the orchestrator makes on the owner's plot and the owner opens (the story's rule 3, T-016.1).
 Why it is the pad's and not the layers', and what it costs: the story's ADR,
 `docs/adr/ADR-0138-the-google-earth-file-is-the-pads.md`; why it holds the White model's parts,
@@ -25,6 +25,16 @@ and what that costs: `docs/adr/ADR-0155-the-white-model-in-google-earth.md`.
   where a second of arc along a great circle is `SECOND_M`, 30.89 m: the hypotenuse of the two.
   An upper bound — a second of longitude in Switzerland is some 21 m, and the points of REFRAME
   lie within 1.94 m, the west's the farthest. `STATED_SECONDS`, the two figures of the page
+- `lv95Of([longitude, latitude])` — `[east, north]` of LV95, in metres, of a place of WGS84 in
+  degrees, by section 1 of the same document, page 3 (ST-045): for New plot's reader of a
+  GeoJSON file alone, which converts a file's WGS84 as it reads it and keeps none of it. It takes
+  any two numbers; whether the place lies on the sheet is its caller's to say
+- `LV95_ACCURACY_M` — 1 m: what page 3 states of section 1, "besser als 1 Meter in der Lage"
+  all over Switzerland, under its worked example (its heading: "Genauigkeit im 1-Meter-Bereich")
+- `SHEET_WGS84` — `{ west: 5.0, east: 11.5, south: 45.3, north: 48.4 }`, in degrees: the box of
+  longitudes and latitudes that holds the map's sheet, `SHEET` of `tools/sketch/swisstopo/hosts.js`,
+  rounded outward to a tenth of a degree. Its longitudes all lie under its latitudes — the one
+  fact that tells a longitude-first pair from a latitude-first one
 
 `tools/sketch/kml/kml.js` — imports `onMap` and `isLV95` of `tools/sketch/new-plot/frame.js`
 and `wgs84Of`, and nothing else: it runs in a page and in Node.
@@ -129,16 +139,22 @@ and nothing else; it runs in a page and in Node. The page names neither `kml.js`
 Inside the pad, positions are metres of the plot's frame and heights metres above sea level;
 a plot's place is LV95 (directive 35). x points along `(sin b, cos b)` in LV95 and y along
 `(-cos b, sin b)`, `b` the bearing (`docs/sketch/new-plot.md`, "The frame, as the pad has it"):
-`onMap` turns `[x, y]` into `[east, north]`. **WGS84 exists here alone**, and only on the way
-out: each corner is converted on its own, so the grid's turn against true north is in the file
-and needs no figure of its own. **Heights are not converted**: Google Earth's altitudes are taken
+`onMap` turns `[x, y]` into `[east, north]`. **WGS84 exists here**, on the way out, and at New
+plot's reader of a GeoJSON file alone, on the way in, which turns a file's corners into LV95 by
+`lv95Of` as it reads them and keeps none of their WGS84 (ST-045). On the way out each corner is
+converted on its own, so the grid's turn against true north is in the file and needs no figure
+of its own. **Heights are not converted**: Google Earth's altitudes are taken
 as metres above sea level, and the raise takes up what differs — Google Earth's ground and sea
 level are not swisstopo's, by a few metres — tuned by eye (the ADR, Decision 4 and 5).
 
 ## Invariants
 
-1. **WGS84 lies in `tools/sketch/kml/` alone**: no `.js` or `.html` of the pad outside it names
-   `wgs84.js` or `wgs84Of` — `tools/sketch/kml/own.check.js` holds it.
+1. **WGS84 lies in `tools/sketch/kml/` alone**, but at New plot's reader of a GeoJSON file: no
+   `.js` or `.html` of the pad outside it names `wgs84.js`, `wgs84Of` or `lv95Of`, but two, by
+   their names, `tools/sketch/new-plot/geojson.js` and `geojson.check.js`, which may name
+   `wgs84.js` and `lv95Of`, and never `wgs84Of`; and a third, `tools/sketch/map/page.check.js`,
+   which may name `kml/wgs84.js` as a file that the map's page loads (T-045.5), and never
+   `wgs84Of` or `lv95Of` — `tools/sketch/kml/own.check.js` holds it.
 2. **Nothing is asked**: no module here asks another machine, and the checks run behind the
    pad's gate. What REFRAME answered was asked by hand while building, and typed in.
 3. **Nothing of a real plot in a check**: the checks read the made-up plot, and places of round
@@ -156,7 +172,17 @@ to its printed figures, 8° 43' 49.80" and 46° 02' 38.86", within half the last
 grid's zero, which the constant terms give alone; and three points of round figures — west
 E 2 500 000 / N 1 140 000, east E 2 830 000 / N 1 170 000, south E 2 720 000 / N 1 080 000 —
 whose WGS84 was asked of swisstopo's REFRAME, `https://geodesy.geo.admin.ch/reframe/lv95towgs84`,
-by hand on 2026-10-15: each within `ACCURACY_M`, the gap worked out on the sphere.
+by hand on 2026-10-15: each within `ACCURACY_M`, the gap worked out on the sphere. And the
+other way, section 1, page 3: its worked example, 46° 02' 38.87" N and 8° 43' 49.79" E, to its
+printed E 2 699 999.76 and N 1 099 999.97, within half the last, 0.005 m; Bern, longitude
+26 782.5" and latitude 169 028.66", which the constant terms give alone, E 2 600 072.37 and
+N 1 200 147.07; the three points of REFRAME, their exact WGS84 each within `LV95_ACCURACY_M`
+of its LV95 (0.12, 0.31 and 0.35 m); round trips, `lv95Of(wgs84Of(p))`, of the made-up
+pentagon's five corners, each within `LV95_ACCURACY_M` (0.39 m), and of the three places of
+REFRAME within `ACCURACY_M` and `LV95_ACCURACY_M` together (1.83 m at the most, the west); and
+`SHEET_WGS84`, the farthest of `wgs84Of` of the four sides of `SHEET` — imported of
+`tools/sketch/swisstopo/hosts.js` — every 10 km, rounded outward to a tenth, every one inside
+it, and its east under its south.
 `tools/sketch/kml/kml.check.js` — at the grid's zero, bearing 90 (x east, y north): a level
 box and a see-through one, each six closed rings of five points at the corners worked out by
 hand and their heights plus a raise of −2.5; a slant along x, `min [0, 0, 10]`, `max [2, 1,
@@ -198,7 +224,10 @@ says what is switched off; the level of both, 105 m, off, `{ text: null }`; a gr
 `['Kitchen']`, the same file as none. `tests/e2e/sketch-3d-kml.spec.ts` holds the same parts in
 a browser, T-038.2. `tools/sketch/kml/own.check.js` — invariant 1, on the pad, where it finds
 nothing, and on a made-up folder, where it finds the script outside `kml/` that imports
-`./kml/wgs84.js`.
+`./kml/wgs84.js`; where `new-plot/geojson.js` and its check, importing `lv95Of` and
+`SHEET_WGS84`, and `map/page.check.js` naming `kml/wgs84.js`, are found by nothing; and where
+the check naming `wgs84Of`, `map/file.js` importing `lv95Of`, `new-plot/other.js` naming it and
+`map/page.check.js` naming it are each found, by its name.
 
 Seventeen breaks of the modules were tried, each alone: every one fails a check (T-016.1); and
 eight of `house.js`, each failing `house.check.js` (T-016.4). Six more of the White model
@@ -217,9 +246,11 @@ the ground written — `house.check.js`; glass written solid — `house.check.js
 - **The command is never run on a real plot by an agent.** The orchestrator runs it on the
   owner's, with the place worked out outside the repository, and sends the owner the file; the
   file's name and its description hold the plot's name, and its points the plot's place.
-- **The document's two sections go opposite ways**: section 1, from WGS84 to LV95, is "im
-  1-Meter-Bereich"; section 2, the one used here, states 0.12" and 0.08" — 4.45 m at the most.
-  Its "Sollwerte" are the exact values; the check holds the formula to what the formula gives,
-  as the page prints it.
+- **The document's two sections go opposite ways**, and both are used here: section 1, page
+  3, from WGS84 to LV95, `lv95Of`, is "im 1-Meter-Bereich", better than a metre; section 2,
+  page 4, from LV95 to WGS84, `wgs84Of`, states 0.12" and 0.08" — 4.45 m at the most. Section 1
+  works in longitude and latitude given in seconds, its λ' and φ' from Bern's; section 2 in
+  y' and x' from the grid's zero. Their "Sollwerte" are the exact values; the check holds each
+  formula to what the formula gives, as the page prints it.
 - **A description's lines** are joined by a line break, which Google Earth may show as a
   blank: they are plain text, and no HTML is written.

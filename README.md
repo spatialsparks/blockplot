@@ -30,6 +30,13 @@ into a folder you pick — or, in a browser that cannot be given a folder, offer
 `plot.json`, to save. New plot works for Switzerland only: the map and the ground are
 swisstopo's.
 
+Or give New plot **a GeoJSON file of your plot's outline**, under "From a file": choose the file,
+or paste its text into the box, and press "Take the outline". Its corners stand on the map as if
+you had clicked them, and the map goes to them. The file may be in LV95, Switzerland's grid
+(EPSG:2056), or in longitude and latitude (WGS84), which is converted to LV95 to about a metre,
+and the plot says so. The file is read in your browser alone: nothing of it is sent anywhere,
+and only its corners go into the plot.
+
 A plot is opened with **File, Open plot**, in one of two ways:
 
 - **A plot's folder**, in Chrome and Edge — the browsers that let a page write to a folder you
@@ -44,8 +51,8 @@ A plot is opened with **File, Open plot**, in one of two ways:
 ## What it asks, and of whom
 
 Your plot and your sketches stay on your computer: in the browser's own store, or in the folder
-you picked. Nothing you draw is sent anywhere. New plot alone asks another machine, swisstopo's,
-for the map, a place and the ground. [PRIVACY.md](PRIVACY.md) says exactly what is asked, of
+you picked. Nothing you draw is sent anywhere, and nothing of a GeoJSON file you give New plot.
+New plot alone asks another machine, swisstopo's, for the map, a place and the ground. [PRIVACY.md](PRIVACY.md) says exactly what is asked, of
 whom, and what each can see.
 
 ## Run it on your own computer

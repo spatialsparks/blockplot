@@ -4,9 +4,11 @@
 // file by its name:
 //
 //   - an address that says how it is asked - http://, https://, ws://, wss:// - names one of the
-//     three hosts, 127.0.0.1, or a host that the script puts together itself, `${HOST}`; and the
+//     three hosts, 127.0.0.1, or a host that the script puts together itself, `${HOST}`; the
 //     names of two kinds of file, which nobody asks - SVG's, of a picture written out as text,
-//     and KML's, of the Google Earth file - where each stands so, to the letter. In a
+//     and KML's, of the Google Earth file - and the four names of frames of a GeoJSON's crs
+//     that New plot's reader of a file takes, which nobody asks either (ST-045), where each
+//     stands so, to the letter. In a
 //     page and in a stylesheet no src, no href and no url( begins with //. Not held: // in a
 //     script, where it begins every comment - a script asks through fetch(, which is held below;
 //   - each of the three hosts is named in hosts.js, and typed in once more in hosts.check.js -
@@ -41,11 +43,17 @@ const ASKING = ['kept.js', 'open-plot.js', 'swisstopo/door.js'];
 const asks = (name) => ASKING.includes(name) || /^map\/[^/]+\.js$/.test(name);
 const isCheck = (name) => name.endsWith('.check.js');
 // An address that says how it is asked, up to what ends it in a text; and those that the pad's
-// code may name beside the three: the name of a picture and the name of KML, each whole, and
-// this machine's address, with or without a port.
+// code may name beside the three: the name of a picture, the name of KML and the four names of
+// frames of new-plot/geojson.js, each whole, and this machine's address, with or without a port.
 const ADDRESS = /\b(?:https?|wss?):\/\/[^\s'"`<>()\\,;\]]*/gi;
 const PICTURE = 'http://www.w3.org/2000/svg';
 const KML = 'http://www.opengis.net/kml/2.2';
+const FRAMES = [
+  'http://www.opengis.net/def/crs/EPSG/0/2056',
+  'http://www.opengis.net/def/crs/OGC/1.3/CRS84',
+  'http://www.opengis.net/def/crs/EPSG/0/4326',
+  'http://www.opengis.net/def/crs/EPSG/0/21781',
+];
 const THIS_MACHINE = /^127\.0\.0\.1(:(\d+|\$\{.*))?$/;
 const SLASHES = /(?:\b(?:src|href)\s*=\s*["']?|url\(\s*["']?)\s*\/\//i;
 const WORDS = ['XMLHttpRequest', 'WebSocket', 'EventSource', 'sendBeacon'];
@@ -82,7 +90,7 @@ function read(folder, under = '') {
  * script itself.
  */
 function strange(address) {
-  if (address === PICTURE || address === KML) return null;
+  if (address === PICTURE || address === KML || FRAMES.includes(address)) return null;
   const [host] = address.slice(address.indexOf('://') + 3).split(/[/?#]/);
   const named = host.replace(/[.:]+$/, '');
   const known = named === '' || named.startsWith('${') || THREE.includes(named);
@@ -200,6 +208,11 @@ try {
   // KML's name, to the letter, and its near miss: another version of it is a host not to name.
   alone('kml/kml.js', `const head = '<kml xmlns="${KML}">';\n`);
   alone('page.js', `const kml = 'http://www.opengis.net/kml/2.3';\n`, SAID.host('www.opengis.net'));
+  // The four names of frames, each to the letter, and their near miss: a frame the pad takes not.
+  for (const frame of FRAMES) alone('new-plot/geojson.js', `const name = '${frame}';\n`);
+  alone('page.js', `const lv95 = 'http://www.opengis.net/def/crs/EPSG/0/2056';\n`);
+  const web = 'http://www.opengis.net/def/crs/EPSG/0/3857';
+  alone('page.js', `const web = '${web}';\n`, SAID.host('www.opengis.net'));
   const [beside, behind] = [`${THREE[0]}.example.org`, `${THREE[0]}@${ELSEWHERE}`];
   alone('page.js', `open('https://${beside}/');\n`, SAID.host(beside), SAID.theirs);
   alone('page.js', `open('https://${behind}/');\n`, SAID.host(behind), SAID.theirs);

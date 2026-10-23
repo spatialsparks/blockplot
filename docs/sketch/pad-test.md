@@ -40,8 +40,8 @@ address, a stand-in's port; and for the browser tests of the map,
 `tests/e2e/sketch-map.spec.ts`, `sketch-map-layers.spec.ts` (T-044.12), `sketch-map-find.spec.ts`
 and `sketch-map-plain.spec.ts`, and
 of the marking, `sketch-new-plot.spec.ts`, `sketch-new-plot-made.spec.ts` (T-031.7),
-`sketch-new-plot-unseen.spec.ts`, `sketch-new-plot-large.spec.ts` and
-`sketch-new-plot-parcel.spec.ts`, in the module that the nine share, each taking its `test`
+`sketch-new-plot-unseen.spec.ts`, `sketch-new-plot-large.spec.ts`,
+`sketch-new-plot-parcel.spec.ts` and `sketch-new-plot-file.spec.ts` (T-045.5), in the module that the ten share, each taking its `test`
 from there, `tests/e2e/sketch-own-pad.ts` (T-031.5): each case on a pad and a stand-in of
 its own (`docs/sketch/map.md`) — and in `sketch-new-plot-folder.spec.ts`, whose pad and stand-in
 `startOwn` of that module starts, and which has a gate of its own browser (T-041.5). **What it does not reach**: a check that
@@ -63,7 +63,8 @@ one (`docs/sketch/example.md`, T-030.5) — those of `tools/sketch/swisstopo/`, 
 `tools/sketch/map/`, whose notes count them (ST-031): among them the two of a plot made in the
 page, `tools/sketch/new-plot/making.check.js` — the golden file `tests/__fixtures__/new-plot/trial-slope.json`, which
 the server's `made` gave and `plotMadeOf` gives, and `trial-slope-photo.json`, the same pentagon
-marked on the aerial photo, with the national map's credit and source typed in (T-044.10) — and
+marked on the aerial photo, with the national map's credit and source typed in (T-044.10), and
+`trial-slope-file.json`, the same pentagon taken from a GeoJSON file (T-045.1) — and
 `making-refused.check.js` (T-041.3), and
 `made-large.check.js` (T-042.4), each of which starts the stand-in alone; the three of an order
 that the server made, `made.check.js`, `made-refused.check.js` and `made-disk.check.js`, went
@@ -72,7 +73,7 @@ with its `made.js` (T-041.4);
 `list.check.js` among them (T-032.4), and three of
 `tools/sketch/info/` — the page's `page.check.js` among them (T-032.5) — which those folders' notes say
 (ST-032), six of `tools/sketch/kml/` — `own.check.js` among them, which holds that WGS84 lies
-there alone (T-016.1), and `white.check.js`, the White model's parts and the switches (ST-038) —
+there alone (T-016.1), but for New plot's reader of a GeoJSON file, `lv95Of` alone (T-045.3), and `white.check.js`, the White model's parts and the switches (ST-038) —
 which its note says (`docs/sketch/kml.md`), one of `tools/sketch/store/` — `rules.check.js`, the
 browser's store's names, keys and rules by hand, that no module of the store asks a machine or
 takes a record away, that `tools/sketch/plot-file.js` and what it loads import nothing of Node,
@@ -1337,6 +1338,21 @@ runs it: `pnpm verify` has the same tests in `pnpm e2e`, beside the web app's (`
   with "Take the parcel under a click" off sets one corner; "Start again"; on, a click at the
   map's middle marks parcel 1234, the map where it was, with one identify at that place asked and
   no search; and a click on, where no parcel lies, sets no corner: the parcel's seven stand
+- `sketch-new-plot-file.spec.ts` — **the story's one end-to-end test of ST-045** (T-045.5): a plot
+  made from a GeoJSON file of its outline, with no corner marked by hand. One case, on a pad and a
+  stand-in of its own, as the tests of the marking are, in a browser that takes no folder; it
+  names nothing of the cadastre, and so passes in both trees. The map's page, `#file-said` saying
+  that nothing of a file is sent; the pentagon given as `trial-slope.geojson` — a `Feature` named
+  `Trial slope`, its `Polygon` in LV95, closed, with no `crs` — by `setInputFiles` on
+  `#file-choose`, and "Take the outline": `The file's outline is marked: 5 corners.`, the body's
+  `marked` its five corners to the centimetre, `file` `lv95`, `given` `true`, `on` and `parcel`
+  empty, `5 corners, 520 m².` and `#no-survey` to the letter, and the map at rest at the middle
+  of their box, E 2 600 021, N 1 200 025.6. Its picture, `file.png`, is that page. The name
+  `Trial slope`, "Make the plot": the file offered as `plot.json` is
+  `tests/__fixtures__/new-plot/trial-slope-file.json` (T-045.1) of the machine's day. No request
+  of the page carried a body, and the stand-in was asked, with the pad's origin, the pictures of
+  the map and the eight GETs of the ground, one after the other — an `OPTIONS` for one of them
+  at most — and nothing else: no search, and no word of the file
 - `sketch-edgeless.spec.ts` — **the story's one end-to-end test of ST-042** (T-042.3), from
   above on the made-up plot, a sketch of one level and no thing: the grid 0.5 m at 8 px a cell,
   then 1, 1, 2, 2 and 5 m at five clicks of `#smaller`; a block drawn by Block from (150.3,
@@ -1421,15 +1437,15 @@ and a cut along its day rooms, by the category that was picked for it:
 what it holds, which tests state it and how it was written is `tests/__fixtures__/CLAUDE.md`'s.
 
 No browser test opens the pad itself on a sketch that it cannot read: what the alarm shows
-of it is looked at by hand (Gotchas). **Ten browser tests open a pad without `--demo`**, each
+of it is looked at by hand (Gotchas). **Eleven browser tests open a pad without `--demo`**, each
 case on a server of its own that is told its port alone (T-041.4), with a stand-in for swisstopo
 beside it, which the map's page is told by its address: the two of the map (T-031.5) and the
 layers' case moved out of the first, `sketch-map-layers.spec.ts` (T-044.12), the
 marking's `sketch-new-plot.spec.ts`, `sketch-new-plot-made.spec.ts` (T-031.7),
 `sketch-new-plot-unseen.spec.ts` (T-041.3) and `sketch-new-plot-large.spec.ts` (T-042.4), the
 one of the word of plain ground, `sketch-map-plain.spec.ts` (T-031.8), the story's end-to-end
-test of ST-043, `sketch-new-plot-parcel.spec.ts` (T-043.6), and the story's end-to-end
-test of ST-041, `sketch-new-plot-folder.spec.ts` (T-041.5), in `sketch-folder.ts`'s browser. The tests of Open plot and of the plot shown last,
+test of ST-043, `sketch-new-plot-parcel.spec.ts` (T-043.6), that of ST-045,
+`sketch-new-plot-file.spec.ts` (T-045.5), and the story's end-to-end test of ST-041, `sketch-new-plot-folder.spec.ts` (T-041.5), in `sketch-folder.ts`'s browser. The tests of Open plot and of the plot shown last,
 `sketch-plots.spec.ts` (T-040.3) and `sketch-plots-last.spec.ts` (T-040.2), hold plots in the
 browser's store of the made-up pad instead.
 
@@ -1449,7 +1465,7 @@ cadastral map's layer of `sketch-own-pad.ts`'s `LAYERS` is its, and so is every 
 what shows from level 25 on in `sketch-map-layers.spec.ts`, `sketch-map-find.spec.ts`,
 `sketch-new-plot.spec.ts`, `sketch-new-plot-made.spec.ts`, `sketch-new-plot-folder.spec.ts` and
 `sketch-new-plot-unseen.spec.ts`, and the files of `sketch-map.spec.ts`: each passes in both
-trees. Two are the cadastre's whole, and Blockplot's tree has neither: `sketch-map-plain.spec.ts`,
+trees, and so does `sketch-new-plot-file.spec.ts`, which expects nothing of it. Two are the cadastre's whole, and Blockplot's tree has neither: `sketch-map-plain.spec.ts`,
 the word of plain ground, which shows with the cadastral map alone, and
 `sketch-new-plot-parcel.spec.ts`, the parcel taken.
 `playwright.sketch.config.ts` starts the made-up pad

@@ -28,7 +28,8 @@ const AROUND_STEP_M = 0.5;
  * stands still meanwhile; and all that is marked stays on its ground as the map is moved, at any
  * level. It gives `read` and `order` of the plot that is marked, and `#plot` says `MARKED`; and
  * `take(corners, parcel)`, a parcel's corners in the place of what was marked - empty, they show
- * and `MARKED` is said, or why not, and nothing shows - and `clicks(on)`, whether a click on the
+ * and `MARKED` is said, or why not, and nothing shows - `takeFile(corners, { wgs84 })`, a GeoJSON
+ * file's the same way (ST-045) - and `clicks(on)`, whether a click on the
  * map sets a corner: true as the page opens. While it is false a click sets nothing and says
  * nothing; a corner's mark is still dragged.
  */
@@ -84,11 +85,13 @@ export function openMarks(map) {
     const says = { corners: corners.length, marked: written(corners), side: now.side };
     Object.assign(says, { area: paper?.areaM2?.toFixed(3) ?? '', around: now.aroundM });
     Object.assign(document.body.dataset, says, { on: now.on.join(' ') });
-    // And whose they are: a parcel's EGRID and whether its corners are as given, or empty.
-    const { parcel } = now;
+    // And whose they are: a parcel's EGRID, or a file's frame - `lv95`, or `wgs84` converted -
+    // and whether the corners of either are as given; each empty where it is none.
+    const { parcel, file } = now;
     Object.assign(document.body.dataset, {
       parcel: parcel?.egrid ?? '',
-      given: parcel?.asGiven ?? '',
+      file: file === null ? '' : file.wgs84 ? 'wgs84' : 'lv95',
+      given: (parcel ?? file)?.asGiven ?? '',
     });
     lay();
     side.dispatchEvent(new CustomEvent(MARKED, { detail: now }));
@@ -164,9 +167,15 @@ export function openMarks(map) {
     if (refused === '') done();
     return refused;
   }
+  /** A GeoJSON file's corners, taken whole (ST-045): shown, or why not, with nothing shown. */
+  function takeFile(corners, file) {
+    const refused = plot.takeFile(corners, file);
+    if (refused === '') done();
+    return refused;
+  }
   /** Whether a click on the map sets a corner from now on. */
   function clicks(on) {
     clicking = on;
   }
-  return { read: plot.read, order: plot.order, take, clicks };
+  return { read: plot.read, order: plot.order, take, takeFile, clicks };
 }

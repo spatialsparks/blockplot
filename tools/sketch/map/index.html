@@ -81,13 +81,14 @@
       <!-- Right of the map: the plot that is marked on it. First the parcel that may be taken
            for it, take.js's: a municipality and a number, or an EGRID, found; the switch that
            has a click take the parcel under it; what is said, and the parcels listed, a button
-           a parcel. The field's limit is the script's. Then its corners and its paper, as
+           a parcel. The field's limit is the script's. Then a GeoJSON file's outline, file.js's,
+           taken; then its corners and its paper, as
            marks.js says them; then its name, the folder that it will get and what makes it,
            make.js's. What a part says is written by its script, as text. -->
       <aside id="plot">
         <!-- The parcel is the cadastre's (docs/sketch/cadastre.md): it lies hidden, and page.js
              shows it and loads take.js only where the pad offers the cadastre. Where it does
-             not - Blockplot - the side begins at Corners. One markup for both: a page of its own
+             not - Blockplot - the side begins at "From a file". One markup for both: a page of its own
              would drift from this one. -->
         <div id="parcel-part" hidden>
           <h2>Parcel</h2>
@@ -105,6 +106,27 @@
           <label><input id="take-parcel" type="checkbox" /> Take the parcel under a click</label>
           <p id="parcel-said" role="status"></p>
           <div id="parcels"></div>
+        </div>
+        <!-- An outline from a GeoJSON file (ST-045), file.js's, in both trees: a file chosen, or
+             GeoJSON pasted into the box - the one given last is taken - read in the page alone,
+             and taken onto the marks as a parcel is. Where the parcel's part is hidden the side
+             begins here. -->
+        <div id="file-part">
+          <h2>From a file</h2>
+          <input
+            id="file-choose"
+            type="file"
+            accept=".geojson,.json,application/geo+json,application/json"
+            aria-label="A GeoJSON file of the plot"
+          />
+          <textarea
+            id="file-text"
+            spellcheck="false"
+            aria-label="GeoJSON of the plot, pasted"
+            placeholder="Or paste its GeoJSON here"
+          ></textarea>
+          <button id="file-take" type="button" disabled>Take the outline</button>
+          <p id="file-said" role="status"></p>
         </div>
         <h2>Corners</h2>
         <p id="corners-said" role="status"></p>

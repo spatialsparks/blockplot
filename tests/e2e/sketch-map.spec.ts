@@ -27,9 +27,10 @@ const MIDDLE = { e: FIRST.e, n: FIRST.n };
 const SAYS_MIDDLE = 'document.body.dataset.e + " " + document.body.dataset.n';
 const sorted = (targets: string[]): string[] => [...targets].sort();
 const TWELVE = [0, 1, 2, 3].flatMap((c) => [0, 1, 2].map((r) => targetOf('national', 15, c, r)));
-const OWN = `frame.css map/find.js map/make.js map/map.css map/map.js map/marking.js map/marks.js
-  map/page.js map/view.js new-plot/frame.js new-plot/making.js new-plot/plot.js
-  new-plot/request.js plot-file.js routes.js squares.js store/held.js store/rules.js
+const OWN = `frame.css kml/wgs84.js map/file.js map/find.js map/make.js map/map.css map/map.js
+  map/marking.js map/marks.js map/page.js map/view.js new-plot/frame.js new-plot/geojson.js
+  new-plot/making.js new-plot/plot.js new-plot/request.js new-plot/ring.js plot-file.js
+  routes.js squares.js store/held.js store/rules.js
   store/ways.js swisstopo/blocks.js swisstopo/cadastre.js swisstopo/catalogue.js swisstopo/door.js
   swisstopo/grid.js swisstopo/ground.js swisstopo/hosts.js swisstopo/lzw.js swisstopo/statuses.js
   swisstopo/tiff.js swisstopo/tile.js windows.js`

@@ -65,11 +65,13 @@ for (const none of [...NONE_IN, /\/\//]) {
 // Its parts, each once: the way back, Find, the places, the map with what lies on it - the word
 // of plain ground first, then the marks of the plot, over it and under all else - the plot's
 // side, the parcel's part at its top (ST-043) - the cadastre's, hidden until page.js shows it -
-// with what is said and pressed there, and the line of what the page asks.
+// and the file's under it (ST-045), with what is said and pressed there, and the line of what the
+// page asks.
 const IDS = ['back', 'find', 'find-words', 'work', 'found', 'find-said', 'places', 'map', 'tiles'];
 IDS.push('plain', 'marks', 'sheet', 'outline', 'along', 'dots');
 IDS.push('said', 'photo', 'steps', 'nearer', 'further', 'credits', 'plot');
 IDS.push('parcel-part', 'parcel', 'parcel-words', 'take-parcel', 'parcel-said', 'parcels');
+IDS.push('file-part', 'file-choose', 'file-text', 'file-take', 'file-said');
 IDS.push('corners-said', 'no-survey', 'undo-corner', 'start-again');
 IDS.push('paper-said', 'side-before', 'side-next', 'around');
 IDS.push('naming', 'name', 'folder', 'make', 'make-said', 'asks');
@@ -89,27 +91,34 @@ assert.equal(count(PAGE, /\smaxlength="/g), 1);
 assert.ok(PAGE.includes(`maxlength="${SEARCH_MAX}"`) && PAGE.includes('<aside id="plot">'));
 assert.ok(PAGE.includes('<label><input id="around" type="number" /> m of ground around the plot'));
 // The parcel's heading, form, field, button and switch, to the letter, at the top of the side,
-// in its part - hidden as the page comes, and ended before Corners; the switch is off as the page
-// comes. A comment of the markup is no part of it.
+// in its part - hidden as the page comes, and ended before the file's; the switch is off as the
+// page comes. Then the file's part (ST-045), shown in both trees, ended before Corners: its
+// heading, chooser, box, button and line, to the letter. A comment of the markup is no part of it.
 const PARCEL = `<aside id="plot"> <div id="parcel-part" hidden> <h2>Parcel</h2> <form id="parcel">
   <input id="parcel-words" type="text" autocomplete="off" spellcheck="false" aria-label="A
   municipality and a parcel number, or an EGRID" placeholder="Bern 1234, or CH…" /> <button
   type="submit">Find the parcel</button> </form> <label><input id="take-parcel" type="checkbox" />
   Take the parcel under a click</label> <p id="parcel-said" role="status"></p> <div
-  id="parcels"></div> </div> <h2>Corners</h2>`;
+  id="parcels"></div> </div> <div id="file-part">`;
+const FILE = `<div id="file-part"> <h2>From a file</h2> <input id="file-choose" type="file"
+  accept=".geojson,.json,application/geo+json,application/json" aria-label="A GeoJSON file of the
+  plot" /> <textarea id="file-text" spellcheck="false" aria-label="GeoJSON of the plot, pasted"
+  placeholder="Or paste its GeoJSON here" ></textarea> <button id="file-take" type="button"
+  disabled>Take the outline</button> <p id="file-said" role="status"></p> </div> <h2>Corners</h2>`;
 const BARE = PAGE.replace(/<!--[\s\S]*?-->/g, '').replace(/\s+/g, ' ');
-assert.ok(BARE.includes(PARCEL.replace(/\s+/g, ' ')));
+for (const part of [PARCEL, FILE]) assert.ok(BARE.includes(part.replace(/\s+/g, ' ')));
 assert.equal(count(PAGE, /<div id="parcel-part" hidden>/g), 1);
 assert.ok(!/\schecked\b/.test(PAGE));
-const OFF = { 'undo-corner': 'Undo corner', 'start-again': 'Start again' };
+const OFF = { 'file-take': 'Take the outline', 'undo-corner': 'Undo corner' };
+OFF['start-again'] = 'Start again';
 Object.assign(OFF, { 'side-before': 'Side before', 'side-next': 'Next side' });
 for (const [id, word] of Object.entries(OFF)) {
   assert.ok(PAGE.includes(`<button id="${id}" type="button" disabled>${word}</button>`), id);
 }
 assert.ok(PAGE.includes('<button id="make" type="submit" disabled>Make the plot</button>'));
-// Ten buttons in all: Find's, the three on the map, the parcel's and those five. And the marks are
+// Eleven buttons in all: Find's, the three on the map, the parcel's and those six. And the marks are
 // a drawing that is read out to nobody: the sentences beside the map say what is marked.
-assert.equal(count(PAGE, /<button\b/g), 10);
+assert.equal(count(PAGE, /<button\b/g), 11);
 assert.ok(PAGE.includes('<svg id="marks" aria-hidden="true">'));
 // Find and the map lie hidden until the page knows whom the pad asks.
 assert.ok(
@@ -120,8 +129,8 @@ assert.ok(!/url\(|@import|http|\/\//i.test(onDisk('map/map.css')));
 
 // Every file that the page and its scripts name, read off their text: a stylesheet by its `href`,
 // a script by its `src`, a module by what it is imported from - each a name from where its file
-// lies, in small letters, and so a file of the pad's own address, which both policies let the
-// page load; each there, on the disk. A plain file server gives them as they lie.
+// lies, in small letters, and figures in a file's name, as one of kml/ has them - and so a file
+// of the pad's own address, which both policies let the page load; each there, on the disk. A plain file server gives them as they lie.
 const names = [...sheets, ...scripts.map(([, said]) => said)].map(
   (said) => /(?:href|src)="([^"]+)"/.exec(said)[1],
 );
@@ -130,17 +139,19 @@ const files = names.map((name) => new URL(name, `${ROOT}/${MAP_PAGE}`).pathname)
 for (const file of files) {
   const body = onDisk(file.slice(1));
   for (const [, from] of body.matchAll(/\bfrom '([^']+)';/g)) {
-    assert.ok(/^\.\.?\/[a-z-]+(\/[a-z-]+)?\.js$/.test(from), `${file} imports ${from}`);
+    assert.ok(/^\.\.?\/[a-z-]+(\/[a-z0-9-]+)?\.js$/.test(from), `${file} imports ${from}`);
     const next = new URL(from, `${ROOT}${file}`).pathname;
     if (!files.includes(next)) files.push(next);
   }
 }
 // Not take.js, new-plot/parcel.js nor swisstopo/parcels.js: the cadastre's, which page.js loads
-// only where the pad offers it, by `import('./take.js')` - the one way in, and no `from`.
+// only where the pad offers it, by `import('./take.js')` - the one way in, and no `from`. But
+// new-plot/ring.js, which the file's reader loads in every pad (ST-045).
 const LOADS = `frame.css map/map.css map/page.js swisstopo/cadastre.js swisstopo/hosts.js
-  map/find.js map/make.js map/map.js map/marks.js new-plot/making.js new-plot/request.js
-  plot-file.js store/held.js store/rules.js store/ways.js map/view.js map/marking.js
-  swisstopo/ground.js new-plot/frame.js new-plot/plot.js routes.js swisstopo/catalogue.js
+  map/file.js map/find.js map/make.js map/map.js map/marks.js new-plot/geojson.js map/view.js
+  new-plot/making.js new-plot/request.js plot-file.js store/held.js store/rules.js store/ways.js
+  map/marking.js kml/wgs84.js new-plot/frame.js new-plot/ring.js swisstopo/ground.js
+  new-plot/plot.js routes.js swisstopo/catalogue.js
   swisstopo/door.js swisstopo/grid.js swisstopo/tile.js swisstopo/statuses.js swisstopo/blocks.js
   swisstopo/lzw.js swisstopo/tiff.js`.split(/\s+/);
 assert.deepEqual(
@@ -175,9 +186,9 @@ async function loaded(search, as) {
 // What the page says of whom it asks, typed in, to the letter - swisstopo's line with a cadastre,
 // and without one, where it names no parcel (T-044.10) - and the policy it puts in.
 const SWISSTOPO =
-  'This page asks swisstopo, the Federal Office of Topography, for the pictures of the map that it shows, for the places that you search for, and for the parcel whose number or EGRID you type, or that you click with "Take the parcel under a click" on: the words that you typed, or the place that you clicked, are all that goes for it. When you make the plot, this page asks it for the heights of the ground under the plot. Nothing else goes out: no name, no sketch, nothing of your design.';
+  'This page asks swisstopo, the Federal Office of Topography, for the pictures of the map that it shows, for the places that you search for, and for the parcel whose number or EGRID you type, or that you click with "Take the parcel under a click" on: the words that you typed, or the place that you clicked, are all that goes for it. When you make the plot, this page asks it for the heights of the ground under the plot. Nothing else goes out: no name, no sketch, nothing of your design, and nothing of a GeoJSON file that you give, which is read in this page alone.';
 const ALONE =
-  'This page asks swisstopo, the Federal Office of Topography, for the pictures of the map that it shows and for the places that you search for: the words that you typed are all that goes for it. When you make the plot, this page asks it for the heights of the ground under the plot. Nothing else goes out: no name, no sketch, nothing of your design.';
+  'This page asks swisstopo, the Federal Office of Topography, for the pictures of the map that it shows and for the places that you search for: the words that you typed are all that goes for it. When you make the plot, this page asks it for the heights of the ground under the plot. Nothing else goes out: no name, no sketch, nothing of your design, and nothing of a GeoJSON file that you give, which is read in this page alone.';
 const STAND_IN =
   'This page asks a stand-in on this machine, http://127.0.0.1:5123, in the place of swisstopo: its map, its places and its ground are made up.';
 const NONE = 'It shows no map and makes no plot.';
@@ -249,16 +260,18 @@ for (const cadastre of [null, {}]) {
 // Of the script, the text: it asks nobody to learn whom it asks; it puts the policy in before it
 // opens the map on the origin of the map service and Find on the search's - which a stand-in
 // cannot tell apart: it is one for all three - and on that map the marking, opened once, and on
-// the marking, where the pad offers the cadastre, the parcel's part shown and the parcel loaded
-// and opened on the search's origin, and then the making - in that order.
+// the marking the file's part (ST-045) and, where the pad offers the cadastre, the parcel's part
+// shown and the parcel loaded and opened on the search's origin, and then the making - in that
+// order. Neither it nor the file's part, which sends nothing of a file (ST-045, rule 1), fetches.
 const SCRIPT = onDisk('map/page.js');
-assert.equal(count(SCRIPT, /\bfetch\b/g), 0);
+for (const text of [SCRIPT, onDisk('map/file.js')]) assert.equal(count(text, /\bfetch\b/g), 0);
 const PUT = 'document.head.append(policy);';
 assert.ok(SCRIPT.includes(`\n${PUT}\n`) && SCRIPT.indexOf(PUT) < SCRIPT.indexOf('openMap('));
 // And the line that says whom it asks is set before the map, Find or the parcel asks anything.
 assert.ok(SCRIPT.indexOf("$('asks').textContent = told.says;") < SCRIPT.indexOf('openMap('));
 const OPENS = ['  const map = openMap(told.map);', '  openFind(told.search, map);'];
-OPENS.push('  const marks = openMarks(map);', '  if (CADASTRE !== null) {');
+OPENS.push('  const marks = openMarks(map);', '  openFile(map, marks);');
+OPENS.push('  if (CADASTRE !== null) {');
 OPENS.push(
   "    $('parcel-part').hidden = false;",
   "    const { openTake } = await import('./take.js');",

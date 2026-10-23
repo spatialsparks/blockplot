@@ -3,7 +3,8 @@
 The page of a new plot (ST-031): swisstopo's map, brought nearer, taken further and moved; a
 place found on it by its words; **the corners of a plot marked on it, the plot named, and made**
 (T-031.7) — in the page itself, its ground asked by the page (ST-041, T-041.3) — or a parcel's
-corners taken, by its number, its EGRID or a click (ST-043, T-043.5). It is the one
+corners taken, by its number, its EGRID or a click (ST-043, T-043.5), or a GeoJSON file's
+outline, chosen or pasted, read in the page alone (ST-045, T-045.5). It is the one
 page of the pad that asks another machine. File's entry "New plot", on
 the pad's own page, leads here (`tools/sketch/open-plot.js`), and "Back to the pad" leads back.
 
@@ -36,12 +37,17 @@ the pad's own page, leads here (`tools/sketch/open-plot.js`), and "Back to the p
   does the word: its paragraph stays in the page, hidden by the stylesheet (T-044.10)
 - **`#plot`, the plot's side**: at its top `#parcel-part`, the parcel's part — the cadastre's,
   shown only where the pad offers it (`docs/sketch/cadastre.md`, T-044.10): hidden as the page
-  comes, and `page.js` shows it; where it stays hidden the side begins at Corners. In it the
+  comes, and `page.js` shows it; where it stays hidden the side begins at "From a file". In it the
   parcel (T-043.5) — `<h2>Parcel</h2>`, the form
   `#parcel` with the field `#parcel-words`, labelled `A municipality and a parcel number, or an
   EGRID`, its placeholder `Bern 1234, or CH…`, and the button "Find the parcel";
   `#take-parcel`, a checkbox, "Take the parcel under a click", off as the page comes;
   `#parcel-said`; and `#parcels`, a button a parcel listed, which look as `#places` does — then
+  `#file-part`, **the file's part** (ST-045, T-045.5), shown in both trees: `<h2>From a
+  file</h2>`, `#file-choose`, a file chooser taking `.geojson,.json,application/geo+json,application/json`,
+  labelled `A GeoJSON file of the plot`; `#file-text`, a box for pasted GeoJSON, labelled
+  `GeoJSON of the plot, pasted`, its placeholder `Or paste its GeoJSON here`, no spell check;
+  `#file-take`, "Take the outline", off as the page comes; and `#file-said` — then
   `#corners-said`; `#no-survey`, hidden until the outline closes;
   `#undo-corner`, "Undo corner", and `#start-again`, "Start again"; `#paper-said`;
   `#side-before` and `#side-next`; `#around`, a field of figures, "m of ground around the plot";
@@ -58,16 +64,24 @@ the pad's own page, leads here (`tools/sketch/open-plot.js`), and "Back to the p
   Federal Office of Topography, for the pictures of the map that it shows and for the places that
   you search for: the words that you typed are all that goes for it. When you make the plot, this
   page asks it for the heights of the ground under the plot. Nothing else goes out: no name, no
-  sketch, nothing of your design.` The page puts its second policy into its head — `policyOf` of
+  sketch, nothing of your design, and nothing of a GeoJSON file that you give, which is read in
+  this page alone.` — both lines end in that sentence since T-045.5 (ST-045, rule 1). The page
+  puts its second policy into its head — `policyOf` of
   what it was told — then opens the map and Find on the two origins, the marking on that map,
-  once, and on the marking, where `CADASTRE` is not null, shows `#parcel-part` and opens the
+  once, the file's part on the marking (`openFile`), and on the marking, where `CADASTRE` is not
+  null, shows `#parcel-part` and opens the
   parcel on the search's origin — `take.js` loaded then by `await import('./take.js')`, and by no
   static import — and then the making; or none
 - `tools/sketch/map/view.js` — the arithmetic of a view, `{ level, e, n }` in a place of `{ wide, high }` pixels,
   with nothing of a page in it: `placeAt`, `pixelOf`, `pictures`, `stepped`, `moved`, `held`,
-  `first`, `showing`, `NEAREST`. `showing(level, photo, from = CADASTRAL_FROM)` (T-044.10): the
+  `first`, `showing`, `NEAREST`, `goesTo`, `SPARE_PX`. `showing(level, photo, from = CADASTRAL_FROM)` (T-044.10): the
   photo where the switch says so; the cadastral map from `from` on, where `from` is not null;
-  else the national map to its last level, `LAYERS.national.to`, 27, and the photo at 28
+  else the national map to its last level, `LAYERS.national.to`, 27, and the photo at 28.
+  `goesTo(corners, { wide, high })`, `{ e, n, level }`, where the map goes for an outline taken —
+  a parcel found or picked, by `take.js`, or a file's: the middle of its box, at the nearest
+  level from `FOUND_AT` of `hosts.js` outward at which the box shows whole with `SPARE_PX`, 20,
+  to spare on each side — level 0 where none does. In `take.js` until T-045.2 moved it here, in
+  Blockplot's tree
 - `tools/sketch/map/map.js` — `openMap(origin)`, the map in `#map`. It gives `view()`, the view with the pixels
   of its place; `placeAt([x, y])`; `goTo({ e, n }, level)`; `shows()`, the layer by its name in
   `LAYERS`; and `say(words)`, a sentence of a script after it, in `#said` before the map's own
@@ -87,10 +101,22 @@ the pad's own page, leads here (`tools/sketch/open-plot.js`), and "Back to the p
   gives `{ said }`, `{ parcels, said }` — several, each `{ name, egrid }`, its name the label by
   `wordsOf` — or `{ taken, said }`, what `boundaryOf` of `tools/sketch/new-plot/parcel.js` read,
   and null while a request is asked: one at a time, `PARCEL_MS`, 20 000, on all of an answer.
-  `goesTo(corners, { wide, high })`, `{ e, n, level }`, where the map goes for a parcel found
-  or picked: the middle of its box, at the nearest level from `FOUND_AT` outward at which the box
-  shows whole with `SPARE_PX`, 20, to spare on each side — level 0 where none does. Then
-  `openTake(origin, map, marks)`: the form, the list and the switch
+  Then `openTake(origin, map, marks)`: the form, the list and the switch; a parcel found or
+  picked, the map goes to by `goesTo` of `view.js`
+- `tools/sketch/map/file.js` (ST-045, T-045.5) — `openFile(map, marks)`, the file's part: the
+  page's wiring, with no check of its own, as `map.js` and `marks.js` have none; the story's
+  browser test presses it. It puts "Take the outline" on, and `#file-said` says first `Choose a
+  GeoJSON file of your plot, or paste one: it is read in this page, and nothing of it is sent.`
+  The one given last is taken: a file chosen empties the box, and a letter typed or pasted into
+  the box lets the file chosen go. Pressed, a file larger than `FILE_MAX_BYTES` of
+  `tools/sketch/new-plot/geojson.js` by its `size` is refused in `outlineOf`'s sentence of size
+  and not read; else its `File.text()`, or the box's text, goes to `outlineOf` — a file that
+  cannot be read says `The file could not be read in this browser.` What is taken goes to
+  `marks.takeFile(corners, { wgs84 })`, and the map goes to it by `goesTo`, as to a parcel
+  found; `#file-said` then says `outlineOf`'s `said`. What either refuses is said, and nothing
+  changes. While one is read a press does nothing; pressed again, the same file or text is read
+  and taken again. Nothing of the file is kept, held in the store or sent: it has no `fetch`,
+  which `page.check.js` holds
 - `tools/sketch/map/marking.js` — `marking()`, a plot while it is marked, with nothing of the
   page in it (cut out of `marks.js` by T-043.4): `add({ e, n }, level, shows)` — empty, or why no
   corner was set — `move(at, place, shows)`, `undo()`, `clear()`, `pick(by)`, `around(figure)` —
@@ -99,21 +125,33 @@ the pad's own page, leads here (`tools/sketch/open-plot.js`), and "Back to the p
   each were set on the cadastral map, to the centimetre, the side the longest again and the ground
   around as it was, no level asked: empty, or why nothing was taken — `A parcel of fewer than three
   corners encloses nothing.`, or more than `CORNERS_MAX` in `An outline has 1000 corners at the
-  most.` — and then nothing changes; `read()`, `{ corners, side, aroundM, on, paper, parcel, said
-  }`, `parcel` null or `{ egrid, number, canton, asGiven }` — `asGiven` true as it is taken,
-  false once a corner is added, moved or undone, and left as it was by a side picked and the
-  ground around; "Start again", and an undo that leaves no corner, let the parcel go — and
-  `order(name)`, with the parcel as its sixth field where there is one and no such key where
-  there is none. `read().on` lists what the corners were marked on in the order of `MARKED_ON`,
+  most.` — and then nothing changes; a file's outline taken before is let go;
+  **`takeFile(corners, { wgs84 })`** (ST-045, T-045.1), a GeoJSON file's corners, each `[e, n]`
+  in LV95, in the place of every corner marked, to the centimetre, **marked on nothing** —
+  `read().on` is `[]` until a corner is set or moved — the side the longest again, the ground
+  around as it was, any parcel let go: empty, or why nothing was taken — `An outline of fewer
+  than three corners encloses nothing.`, or more than `CORNERS_MAX` in the same sentence as a
+  parcel's — and then nothing changes; `read()`, `{ corners, side, aroundM, on, paper, parcel,
+  file, said }`, `parcel` null or `{ egrid, number, canton, asGiven }` — `asGiven` true as it is
+  taken, false once a corner is added, moved or undone, and left as it was by a side picked and
+  the ground around; `file` null or `{ wgs84, asGiven }`, the same; "Start again", and an undo
+  that leaves no corner, let the parcel or the file go; a parcel and a file never stand together
+  — and `order(name)`, with the parcel or the file as its sixth field where there is one and no
+  such key where there is none. `read().on` lists what the corners were marked on in the order of `MARKED_ON`,
   `national`, `cadastral`, `photo` — the national map one since T-044.10. `said.survey`, whose
   the corners are: the hand's sentence, `Marked by hand on a map: good to a few decimetres, no
   survey, and of no legal effect.` (T-044.10, which names no map); as given, `Parcel <n>
   (<c>) of the official survey, as geo.admin.ch gives it: no extract of the land register, and of
   no legal effect.`; changed, `After parcel <n> (<c>) of the official survey, changed by hand: no
-  survey, and of no legal effect.`
+  survey, and of no legal effect.`; of a file, as given, `From a file you gave: no survey, and of
+  no legal effect.`; changed, `After a file you gave, changed by hand: no survey, and of no legal
+  effect.`; converted from WGS84, `From a file you gave, converted from WGS84 to about a metre: no
+  survey, and of no legal effect.`; converted and changed, `After a file you gave, converted from
+  WGS84 to about a metre, changed by hand: no survey, and of no legal effect.`
 - `tools/sketch/map/marks.js` — `MARKED`, which `make.js` imports, and `openMarks(map)`, the
   marks and the plot's side: it gives `read` and `order`, `take(corners, parcel)` — empty, the
-  corners shown and `MARKED` said, or the sentence of why not, nothing shown — and
+  corners shown and `MARKED` said, or the sentence of why not, nothing shown —
+  `takeFile(corners, { wgs84 })`, a GeoJSON file's the same way (ST-045), which `file.js` calls — and
   `clicks(on)`, whether a click on the map sets a corner, true as the page opens: while it is
   false a click sets nothing and says nothing, and a corner's mark is still dragged. **`#plot`
   says one word, `MARKED`, `marked`**, with what `read()` gives as its `detail`; `#no-survey`
@@ -136,14 +174,15 @@ the pad's own page, leads here (`tools/sketch/open-plot.js`), and "Back to the p
   marking `corners`, how many, `marked`, each corner as `E,N` to the centimetre with a blank
   between two, `area`, to the thousandth of a square metre, or empty, `side`, the corner that
   the paper's side begins at, from 0, `around`, metres, and `on`, `national`, `cadastral`,
-  `photo`, or a map and the photo with a blank between, `parcel`, the EGRID of a parcel taken, or empty, and `given`, `true`,
-  `false` or empty — whether its corners are as given; and of the making `folder`, the sentence of `#folder`, and `making`,
+  `photo`, or a map and the photo with a blank between, `parcel`, the EGRID of a parcel taken, or empty, `file`, `lv95` or
+  `wgs84` — a GeoJSON file's outline taken, as given or converted — or empty (ST-045), and `given`, `true`,
+  `false` or empty — whether the corners of the parcel or the file are as given; and of the making `folder`, the sentence of `#folder`, and `making`,
   `true` from the press until the answer
 
 ## What the owner does there
 
 - **A parcel is taken whole** (ST-043, T-043.5). It is the cadastre's, shown only where the pad
-  offers it (`docs/sketch/cadastre.md`): where it does not, the side begins at Corners, and the
+  offers it (`docs/sketch/cadastre.md`): where it does not, the side begins at "From a file", and the
   corners are marked by hand on the national map or the photo. "A municipality and a parcel number, or an
   EGRID" typed, and "Find the parcel" — or Enter: an EGRID is asked by the find; words by the
   search — none, `No parcel <words> was found.`; one, then the find by its EGRID at once;
@@ -160,6 +199,16 @@ the pad's own page, leads here (`tools/sketch/open-plot.js`), and "Back to the p
   not answer.`, `… answered <status>. It said: <words>`, `… answered what cannot be read.` — is
   said, and the corners stay as they were, to be marked by hand. While a request is asked, a
   Find, a pick or a click asks nothing and says nothing.
+- **An outline is taken from a GeoJSON file** (ST-045, T-045.5), in both trees, under the
+  parcel's part and above Corners: a file chosen, `.geojson` or `.json`, or GeoJSON pasted into
+  the box — the one given last — and "Take the outline". It is read in the page alone, and
+  nothing of it is sent, kept or held. Its corners stand on the map as a parcel's do, in the
+  place of any marked, marked on nothing, and the map goes to them, whole; `#file-said` says
+  `The file's outline is marked: <k> corners.`, and after it that the file gave longitude and
+  latitude, converted to LV95 to about a metre, what was left out, and the features passed over
+  — `outlineOf`'s line (`docs/sketch/new-plot.md`). What is refused is one sentence there, and
+  nothing changes. Then it is New plot as it is: a corner dragged, the side picked, the ground
+  around, a name, and "Make the plot", whose plot says that its outline came from a file you gave.
 - **A corner is set by a click that was no drag**, where a pixel of the map is half a metre or
   less — `MARK_FROM`, level 26 — at the place under the pointer, to the centimetre. Further, a
   click sets none, and `#said` says `Come nearer to mark a corner: here a pixel of the map is
@@ -243,7 +292,9 @@ the pad's own page, leads here (`tools/sketch/open-plot.js`), and "Back to the p
    no referrer — and a parcel's request the same, with the words typed, an EGRID typed or
    picked, or the place clicked, and nothing else of the person's (T-043.5); the door asks the ground the same way, with a `Range` where it asks a part, and
    nothing of the plot's name. Nothing of the map is drawn into a canvas, kept in a store or
-   handed to the pad's server.
+   handed to the pad's server. **Nothing of a GeoJSON file given goes anywhere** (ST-045, rule
+   1): it is read in the page; its corners alone go into the plot, and the ground under them is
+   asked as for any plot.
 4. **One layer at a time** (`showing`): the national map up to level 24, the cadastral map from
    `CADASTRAL_FROM` on, the aerial photo where `#photo` is pressed. Where the pad offers no
    cadastre (T-044.10) the national map up to its last level, 27, and at 28, which it has not,
@@ -298,14 +349,15 @@ the pad's own page, leads here (`tools/sketch/open-plot.js`), and "Back to the p
 
 ## Test
 
-`pnpm sketch:check` finds seven checks here: `tools/sketch/map/view.check.js`, every figure by hand;
+`pnpm sketch:check` finds seven checks here: `tools/sketch/map/view.check.js`, every figure by hand,
+`goesTo`'s among them since T-045.2 moved them from `take.check.js`, unchanged;
 `tools/sketch/map/take.check.js` (T-043.5), the first half of a parcel taken, asking the stand-in
 itself — `Musterlingen 1234` in two requests, its EGRID typed with blanks in one, `Musterlingen
 77` listed by its labels and the second picked, none, a hole and a part left out, a building
 right and a condominium refused, 120 corners, a click on 1234 and in the hole of 1235, nothing
 from afar, no second request while one is asked, every request at the address that `hosts.js`
 builds with no cookie and no referrer — then a server of its own: a failure with long words,
-no JSON, no answer within 60 ms; `goesTo` by hand; `openTake` on a made-up page with a made-up
+no JSON, no answer within 60 ms; `openTake` on a made-up page with a made-up
 map and marks — the field's limit, the map at a parcel found or picked, a refusal of the marks
 said, the switch handing `clicks(false)` and back, a click's parcel taken where the map stands
 and none asked with the switch off; and of the script the text;
@@ -322,7 +374,15 @@ ground as it was, its area as `paperOf` says and by hand; `asGiven` false after 
 moved or undone, still true after a side picked and the ground changed; "Start again", and an
 undo to no corner, letting it go; two corners and 1001 refused, nothing changed; the two
 sentences to the letter; and the order with its parcel, as given and changed, as `orderOf` reads
-it, and with no `parcel` key where it was marked by hand; `tools/sketch/map/make.check.js`, the first half of the making (T-041.3), which starts nothing
+it, and with no `parcel` key where it was marked by hand; `tools/sketch/map/marking-geojson.check.js`
+(T-045.1), a file's outline taken — the made-up pentagon, a hair beyond the centimetre, taken
+over corners marked by hand on the photo and over a parcel taken: each corner to the centimetre,
+marked on nothing, the side the longest, the ground as it was, the parcel let go; `asGiven`
+false after a corner moved, added or undone, and what showed then is what `on` says; "Start
+again", an undo to no corner and a parcel taken after it letting the file go; two corners and
+1001 refused, nothing changed, and 1000 taken; the four sentences to the letter; the order with
+its file, as given and changed, converted or not, as `orderOf` reads it back; and an outline of
+991 m by 20 m taken all the same, its paper refused in `paperOf`'s sentence; `tools/sketch/map/make.check.js`, the first half of the making (T-041.3), which starts nothing
 and asks nobody: the folder of a name, with no list of the plots asked; `idOf` of a name among
 held ids and a folder's names, in other letters too, `home` and `example` never; each sentence to
 the letter — a plot not made, cut to 400 whole characters, a folder that could not be written
@@ -337,7 +397,11 @@ second policy in before it opens the map (T-041.2); and since T-044.10 the parce
 `#parcel-part`, hidden, the files it loads without `take.js`, `new-plot/parcel.js` and
 `swisstopo/parcels.js`, `import('./take.js')` once and where `CADASTRE` is not null, and the
 swisstopo line typed in with a cadastre and without one, `toldOf(…, null)`, and its default
-`CADASTRE`. `view.check.js` holds which layer shows for `from` 25 and for `from` null, level by
+`CADASTRE`; and since T-045.5 the file's part to the letter, between the parcel's and Corners,
+its button off, the two lines' last sentence of a GeoJSON file, `openFile` after the marking, no
+`fetch` in `file.js`, and the files it loads with `map/file.js`, `new-plot/geojson.js`,
+`new-plot/ring.js` and `kml/wgs84.js` — a module's name may hold a figure now, and nothing else
+more. `view.check.js` holds which layer shows for `from` 25 and for `from` null, level by
 level. With
 `tools/sketch/swisstopo/served.check.js` and `named.check.js`. What the page does in a browser, by `pnpm
 e2e:sketch sketch-map` and `pnpm e2e:sketch sketch-new-plot`, each case on a pad and a stand-in
@@ -373,7 +437,16 @@ the parcel's credit and source as given, of the day, and its heights — no corn
 stand-in asked the search, the find and the terrain, in that order, and nothing else but
 pictures; `Musterlingen 77`, three listed, the second picked, marked and `aria-current`; and
 "Take the parcel under a click": off, a click sets a corner; on, a click marks parcel 1234 where
-the map stands, with one identify asked, and a click where no parcel lies sets no corner. **The four scripts and the
+the map stands, with one identify asked, and a click where no parcel lies sets no corner; and
+`sketch-new-plot-file.spec.ts`, **the story's end-to-end test of ST-045** (T-045.5), in a
+browser that takes no folder, naming nothing of the cadastre, so that it passes in both trees:
+the pentagon given as `trial-slope.geojson`, a `Feature` of LV95 with no `crs`, by
+`setInputFiles` on `#file-choose`, and "Take the outline" — `The file's outline is marked: 5
+corners.`, its corners to the centimetre, `file` `lv95`, `given` `true`, `on` empty, and the map
+at the middle of their box, E 2 600 021, N 1 200 025.6; `file.png`; named `Trial slope` and
+made, `plot.json` offered the golden `tests/__fixtures__/new-plot/trial-slope-file.json` of the
+day; no request of the page with a body, and the stand-in asked the pictures of the map and the
+eight GETs of the ground, and nothing else — no word of the file. **The four scripts and the
 stylesheet of T-031.5 were tried broken one thing at a time**, 188 breaks: a check or a case
 fails for each but two, which change nothing (ADR-0127). **So were the scripts, the
 page and the stylesheet of T-031.7**, 279 breaks — 181 against the checks, on a copy outside
@@ -475,14 +548,14 @@ T-031.8**, 32 breaks, each alone and in place: every one of the 10 of the page f
   that the search does not answer, and takes the next. No second is asked while one is.
 - An entity in a name, `&amp;`, shows as it is written: tags are taken out, and nothing is read.
 - The server gives a file one folder deep and no deeper: the map's scripts lie in this folder.
-- `tools/sketch/map/marks.js` stands at 172 lines and `tools/sketch/map/marking.js` at 169 since
-  T-043.4 cut the marking in two, `tools/sketch/map/map.js` at 241, `tools/sketch/map/find.js` at 152, `tools/sketch/map/make.js` at 208,
-  `tools/sketch/map/view.js` at 125, `tools/sketch/map/page.js` at 85 (T-044.10), `tools/sketch/map/take.js` at 212 (T-043.5); the page at 143
+- `tools/sketch/map/marks.js` stands at 172 lines and `tools/sketch/map/marking.js` at 196 (T-045.1; 169 since
+  T-043.4 cut the marking in two), `tools/sketch/map/map.js` at 241, `tools/sketch/map/find.js` at 152, `tools/sketch/map/make.js` at 208,
+  `tools/sketch/map/view.js` at 152 and `tools/sketch/map/take.js` at 189 (T-045.2), `tools/sketch/map/page.js` at 85 (T-044.10); the page at 143
   and `tools/sketch/map/map.css` at 277, counted by hand. **`tools/sketch/map/find.check.js` is full, at 299**, and
-  `tools/sketch/map/take.check.js` at 295; `tools/sketch/map/page.check.js`, which holds the word of plain
+  `tools/sketch/map/take.check.js` at 275 (T-045.2); `tools/sketch/map/page.check.js`, which holds the word of plain
   ground and the parcel's parts, stands at 277.
-  `tools/sketch/map/make.check.js` stands at 124 (T-041.3), `tools/sketch/map/marking.check.js` at 269,
-  `tools/sketch/map/marking-parcel.check.js` at 152, `tools/sketch/map/view.check.js` at 254. **The four
+  `tools/sketch/map/make.check.js` stands at 124 (T-041.3), `tools/sketch/map/marking.check.js` at 277,
+  `tools/sketch/map/marking-parcel.check.js` at 152, `tools/sketch/map/marking-geojson.check.js` at 175 (T-045.1), `tools/sketch/map/view.check.js` at 279 (T-045.2). **The four
   browser tests of T-031.5 and T-031.7 are full**, at 297, 291, 300 and 286 (T-041.3, which moved a case of the last into `sketch-new-plot-unseen.spec.ts`), and their module
   is full too, at 300: what is tested next of this page wants a file of its own — as the word
   of plain ground has, `sketch-map-plain.spec.ts`, at 239 — and one thing more of that module

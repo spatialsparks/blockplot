@@ -16,9 +16,9 @@ part, `POST /new-plot/` and `made.js`, which wrote the plot into a folder of the
 `MAKE_MAX_BYTES` and `asked`, the server's address of a new plot and what a request there was to
 do, went with T-041.4.
 
-- `orderOf(text)` — an order read, `{ name, corners, side, aroundM, on }`, and `parcel` where
-  it had one, or `{ status: 400, refused }`: one sentence, the first of the module's list of
-  nine that holds. A corner is `[easting, northing]` in LV95; `side` is the corner that the side
+- `orderOf(text)` — an order read, `{ name, corners, side, aroundM, on }`, and `parcel` or
+  `file` where it had one, or `{ status: 400, refused }`: one sentence, the first of the
+  module's list of eleven that holds. A corner is `[easting, northing]` in LV95; `side` is the corner that the side
   begins at; `on` is one of five — a map, the photo, or a map and the photo, in that order:
   `["national"]`, `["cadastral"]`, `["photo"]`, `["national","photo"]`, `["cadastral","photo"]`
   (the national map one since T-044.10, for a pad that offers no cadastre; never the two maps).
@@ -31,7 +31,15 @@ do, went with T-041.4.
   true or false — whether the corners are still the parcel's as given, or were changed by hand
   since. Any other shape is refused, the ninth sentence, after `on`'s: `Its parcel is none: an
   EGRID, CH and twelve figures; a number of 20 characters at the most; a canton, two capital
-  letters; and whether its corners are as given.` Limits: `NAME_MAX`, 80; `CORNERS_MAX`, 1000
+  letters; and whether its corners are as given.` `file` (ST-045, T-045.1) is absent but where
+  the corners came from a GeoJSON file the person gave, and then exactly `{ wgs84, asGiven }`,
+  two booleans: whether its corners were converted from WGS84, and whether they are still as the
+  file gave them. With a `file`, `on` may also be `[]` — corners that no map showed, as a file's
+  are until one is set or moved — or any of the five; without one, `[]` is refused in the eighth
+  sentence. Any other shape of a file is refused, the tenth sentence, after the parcel's: `Its
+  file is none: whether its corners were converted from WGS84, and whether they are as given.`;
+  and a parcel and a file together, the eleventh: `It has a parcel and a file: its corners are
+  the one's or the other's.` Nothing else of the file is in an order. Limits: `NAME_MAX`, 80; `CORNERS_MAX`, 1000
   (50 until T-043.1: a parcel's boundary is taken with all its corners, for hand and parcel
   alike — `It has no outline: three corners to 1000, each an easting and a northing in
   metres.`); `AROUND_MAX_M`, 20 — and `AROUND_M`, 5, is what a page offers
@@ -82,11 +90,17 @@ but `squares.js` and `windows.js`, for their effect. The map's page loads it thr
 `making.js` (T-041.3); the server did until T-041.4. What the corners were marked on is said by
 `MARKED_ON` — `the national map` (T-044.10), `the cadastral map`, `the aerial photo` — and the
 cantons' credit, `© Cadastral Surveying Switzerland / FL`, stands beside swisstopo's only where
-the corners touch the cadastral map or are a parcel's; else `© swisstopo` alone.
+the corners touch the cadastral map or are a parcel's; else `© swisstopo` alone — so of corners
+from a file, `© swisstopo` alone but where a corner was moved on the cadastral map. A file's
+words (ST-045, T-045.1, `fileWords`) say, in `credit` and in the first source, that the outline
+came from a file you gave, or is after one, changed by hand; converted from WGS84 to about a
+metre, where it was; with no survey and no legal effect; and that where the file came from, and
+on what terms, is not recorded. Nothing of the file but its corners reaches the plot. The eight
+texts are `docs/STORAGE_FORMAT.md`'s, "A plot that is made from a map".
 
-- `plotOf({ name, corners, side, aroundM, on, parcel, ground, day })` — `{ site }`, a site as `write` of
+- `plotOf({ name, corners, side, aroundM, on, parcel, file, ground, day })` — `{ site }`, a site as `write` of
   `tools/sketch/plot-file.js` takes one, or `{ refused }`: a sentence of `paperOf`'s, or `steep`. The
-  first six are an order's, `parcel` where it has one. `ground` is `{ cells: { west, east, south, north }, heightsM,
+  first seven are an order's, `parcel` or `file` where it has one. `ground` is `{ cells: { west, east, south, north }, heightsM,
   tiles }` — `heightsM[row][column]`, rows from south to north and in a row from west to east,
   the height of the cell whose middle lies at `E = (west + column + 0.5) * 0.5`,
   `N = (south + row + 0.5) * 0.5`; `tiles`, each `{ name, year }`: what `groundOf` of
@@ -133,15 +147,20 @@ before the disk, in a module that imports nothing of Node and loads none that do
   first of its `sources`, which say `the aerial photo` and `© swisstopo` alone. Marked on the
   national map, as Blockplot marks one, the plot is that golden but for those two, which say `the
   national map` and `© swisstopo` alone
+- **And the same pentagon taken from a file** (ST-045, T-045.1):
+  `tests/__fixtures__/new-plot/trial-slope-file.json`, written once by `plotMadeOf` of the order
+  with `"on":[]` and `"file":{"wgs84":false,"asGiven":true}`, of 2026-10-20 — byte for byte
+  `trial-slope-photo.json` but its `credit`, `Outline: from a file you gave, no survey. Ground:
+  swissALTI3D. © swisstopo`, and the first of its `sources`, in both trees
 
 `tools/sketch/new-plot/parcel.js` — the cadastre's, loaded only where the pad offers it
 (`docs/sketch/cadastre.md`), through `map/take.js`, and left out of Blockplot's tree. A parcel
 read (ST-043, T-043.3): what the owner typed in New
 plot's field "Parcel", what swisstopo's search lists for it, and a parcel's boundary out of an
 answer of the find or the identify, as the corners of an order. It imports `SEARCH_MAX`
-and `SHEET` of `tools/sketch/swisstopo/hosts.js`, `egridOf` and `PARCELS_MOST` of `parcels.js`, `enclosed` of
-`frame.js` and `CORNERS_MAX` and `NUMBER_MAX` of `request.js`, and nothing else — no script of
-`map/`. It asks, shows and marks nothing: the map's page loads it (T-043.5), hands it what came,
+and `SHEET` of `tools/sketch/swisstopo/hosts.js`, `egridOf` and `PARCELS_MOST` of `parcels.js`,
+`CORNERS_MAX` and `NUMBER_MAX` of `request.js` and `largestOf` of `ring.js`, and nothing else — no
+script of `map/`. It asks, shows and marks nothing: the map's page loads it (T-043.5), hands it what came,
 and does the rest itself; how corners are taken is the marking's (T-043.4).
 
 - `typedOf(typed)` — what the field held, without the blanks at its ends: `{ egrid }` where
@@ -165,19 +184,104 @@ and does the rest itself; how corners are taken is the marking's (T-043.4).
   two capital letters and its `geometry` a `Polygon` or a `MultiPolygon`, each part one ring or
   more, each ring one pair or more of finite numbers on `SHEET`; `{ refused }`, `Parcel <n>
   (<c>) has no EGRID that the pad can read.`, where `egridOf` takes no `egris_egrid`. The
-  corners: of the part whose outer ring encloses the most, the first of two alike, its outer
-  ring as it came — a corner that repeats the one before it taken as one, the corner that closes
-  the ring taken off, nothing rounded, moved or turned. Fewer than three: null; more than
-  `CORNERS_MAX`: `Parcel <n> (<c>) has <count> corners, and a plot has 1000 at the most.` Else
-  **`{ parcel: { egrid, number, canton }, corners, left }`** — `corners` each `[e, n]` in LV95;
-  `left` what was left out, or empty: `The largest of its 2 parts is marked; the other, <a> m²,
-  is left out.` or `The largest of its <k> parts is marked; the other <k-1>, <a> m² in all, are
-  left out.`; `Its hole of <a> m² is not left out of the plot.` or `Its <h> holes, <a> m² in all,
-  are not left out of the plot.` — both, the parts' first, a blank between. An area is
-  `enclosed` of the outer rings, or of the holes of the part marked, to a whole square metre.
-  Every word of a service that a sentence repeats is a text: its tags out (`/<[^<>]*>/g`, the
+  corners and `left` are `largestOf`'s of its parts (`ring.js`, below, T-045.2). Fewer than
+  three corners: null; more than `CORNERS_MAX`: `Parcel <n> (<c>) has <count> corners, and a
+  plot has 1000 at the most.` Else **`{ parcel: { egrid, number, canton }, corners, left }`** —
+  `corners` each `[e, n]` in LV95, and `left`, both as `largestOf` gives them. Every word of a service that a sentence repeats is a text: its tags out (`/<[^<>]*>/g`, the
   expression of `wordsOf`, said again), its blanks at the ends off, cut to 40 characters, whole
   ones, with no `…` (ADR-0185)
+
+`tools/sketch/new-plot/ring.js` — the outline of a polygon (ST-045, T-045.2): one computation
+for a ring (directive 32), which a parcel read (`parcel.js`) uses, and a GeoJSON file's reader
+(`geojson.js`, T-045.4), in Blockplot's tree as in this one. It imports `enclosed` of `frame.js` and nothing else, and has no
+page, request, clock or global. It refuses nothing: how few or how many corners are too few or
+too many is its caller's sentence.
+
+- `largestOf(parts)` — `parts` a polygon's parts, each a list of rings, the outer first, each
+  ring a list of `[e, n]` in LV95 that its caller has read, none of them empty: **`{ corners,
+  left }`**. `corners`: of the part whose outer ring encloses the most, the first of two alike,
+  its outer ring as it was given — a corner that repeats the one before it taken as one, the
+  corner that closes the ring, a repeat of the first, taken off, a ring left open taken as it
+  is; nothing rounded, moved or turned. `left`, what was left out, or empty: `The largest of its
+  2 parts is marked; the other, <a> m², is left out.` or `The largest of its <k> parts is marked;
+  the other <k-1>, <a> m² in all, are left out.`; `Its hole of <a> m² is not left out of the
+  plot.` or `Its <h> holes, <a> m² in all, are not left out of the plot.` — both, the parts'
+  first, a blank between. An area is `enclosed` of the ring with its figures from its first
+  corner (see "Gotchas"), the outer rings of the other parts or the holes of the part marked,
+  to a whole square metre
+
+`tools/sketch/new-plot/geojson.js` — a GeoJSON file read (ST-045, T-045.4): the text of a file, or
+of what was pasted, read into one outline's corners in LV95, or refused in one sentence. In
+Blockplot's tree as in this one; the page that hands it the text is T-045.5's. It imports
+`largestOf` of `ring.js`, `isLV95` of `frame.js`, `CORNERS_MAX` of `request.js`, `SHEET` of
+`tools/sketch/swisstopo/hosts.js`, and `lv95Of` and `SHEET_WGS84` of `tools/sketch/kml/wgs84.js` —
+one of the two files outside `kml/` that `kml/own.check.js` lets name it — and nothing else. No
+page, request, clock or global: the bytes of a text are counted by its code points, as
+`TextEncoder` counts them. Its coordinates are never guessed (ST-045, rule 2); WGS84 is converted
+here, every position by `lv95Of`, once, and nothing of it is kept (rule 3); the ring is
+`largestOf`'s, and this module has no rule of its own for the part, the closing corner, repeats
+or what is left out (rule 4); nothing is rounded, moved or turned (rule 5).
+
+- `FILE_MAX_BYTES` — 5 000 000, 5 MB of UTF-8, the owner's cap of 2026-10-23
+- `SAID` — its sentences, frozen
+- `outlineOf(text)` — **`{ corners, wgs84, said }`**: `corners` each `[e, n]` in LV95 as
+  `largestOf` gives them, `wgs84` whether they were converted, `said` the line; or
+  **`{ refused }`**, one sentence. By this rule, in this order, the first that holds:
+  1. no text, or blank: `Choose a GeoJSON file, or paste one into the box.`; more than
+     `FILE_MAX_BYTES` in UTF-8: `The file is larger than 5 MB: give the outline of your plot
+     alone.`; no JSON: `It is no JSON: a GeoJSON file is JSON text.`
+  2. the geometry: a `Polygon` or `MultiPolygon` is itself; a `Feature`, its `geometry`; a
+     `FeatureCollection`, of its `features` (a list, else no GeoJSON) those whose `geometry` is a
+     `Polygon` or `MultiPolygon` — several: `The file holds <k> outlines: keep the one of your
+     plot, and give it again.`; one: taken, and the other features are passed over. A `Point`,
+     `MultiPoint`, `LineString`, `MultiLineString`, `GeometryCollection`, a `Feature` whose
+     geometry is null, absent or none of the two, a collection with no polygon: `It holds no
+     outline: no Polygon or MultiPolygon.` Any other object, or no object: `It is no GeoJSON: no
+     Feature, FeatureCollection or geometry.` Every part one ring or more, every ring one
+     position or more, every position two finite figures or three — a height, not read — else
+     `Its outline's coordinates are none: two figures for each corner, or three.`
+  3. the frame, of the top object's `crs` — one on a feature of a collection is not read. Absent
+     or null: none. Else its `properties.name`, trimmed, looked up to the letter in the table
+     below. A name of none: `Its crs, <name>, is none that the pad takes: LV95, EPSG:2056, or
+     longitude and latitude, WGS84.`, the name cut to 40 characters; a `crs` with no name that is
+     a text, or a blank one: `Its crs says no frame that the pad can read: LV95, EPSG:2056, or
+     longitude and latitude, WGS84.`
+  4. what the coordinates are, of the first two figures of every position of the geometry taken,
+     all of them: **LV95** where each is `isLV95`; **LV95, north first** where each reversed is;
+     **LV03** where each plus `[2 000 000, 1 000 000]` lies on `SHEET`; **WGS84** where each lies
+     in `SHEET_WGS84`, longitude first; **WGS84, latitude first** where each reversed does; else
+     **of no grid**. They cannot overlap: no longitude or LV03 figure is two million, and no LV95
+     or LV03 figure is that small. With no `crs`: LV95 taken; WGS84 converted; latitude first,
+     `Its coordinates give the latitude before the longitude: GeoJSON gives the longitude
+     first.`; north first, `Its coordinates give the north before the east: GeoJSON gives the
+     east first.`; LV03, `This file is in LV03, the old Swiss grid: export it again in LV95,
+     EPSG:2056.`; of no grid, `Its coordinates are of no grid of Switzerland: the first corner is
+     <a>, <b>.` With a `crs` of LV03: that LV03 sentence. Of LV95 or WGS84: taken or converted
+     where the coordinates are that, else `Its crs says <LV95, EPSG:2056 | WGS84>, and its
+     coordinates are <LV95 | LV95, north first | LV03 | longitude and latitude | latitude and
+     longitude, latitude first | of no grid of Switzerland>.`
+  5. WGS84 converted, every position by `lv95Of`. Then every corner of every part on `SHEET`,
+     its edges in — else `A corner lies off the map of Switzerland: New plot makes plots in
+     Switzerland alone.`, LV95 off the sheet too
+  6. the ring, `largestOf` of the parts in LV95: fewer than three corners, `The outline has
+     fewer than three corners: it encloses nothing.`; more than `CORNERS_MAX`, `The outline has
+     <k> corners, and a plot has 1000 at the most.`
+  7. `said`, a blank between each that is not empty: `The file's outline is marked: <k>
+     corners.`; where converted, `The file gives longitude and latitude (WGS84): its corners are
+     converted to LV95, good to about a metre.`; `left` of `largestOf`; and where some were
+     passed over, `One feature that is no outline was passed over.` or `<p> features that are no
+     outline were passed over.`
+
+  The thirteen names of a `crs`, each to the letter:
+
+  | Frame | Names |
+  | --- | --- |
+  | LV95 | `EPSG:2056`, `urn:ogc:def:crs:EPSG::2056`, `http://www.opengis.net/def/crs/EPSG/0/2056` |
+  | WGS84 | `urn:ogc:def:crs:OGC:1.3:CRS84`, `urn:ogc:def:crs:OGC::CRS84`, `OGC:CRS84`, `http://www.opengis.net/def/crs/OGC/1.3/CRS84`, `EPSG:4326`, `urn:ogc:def:crs:EPSG::4326`, `http://www.opengis.net/def/crs/EPSG/0/4326` |
+  | LV03 | `EPSG:21781`, `urn:ogc:def:crs:EPSG::21781`, `http://www.opengis.net/def/crs/EPSG/0/21781` |
+
+  The four of `www.opengis.net` are names of frames, which nobody asks:
+  `tools/sketch/swisstopo/named.check.js` lets them through, each to the letter.
 
 ## An order made
 
@@ -287,8 +391,10 @@ So with `b` the bearing: in LV95 `x` points along `(sin b, cos b)` — east, nor
 
 ## Test
 
-`pnpm sketch:check` finds the eight checks by their names. Five start nothing and read no
-file — but `parcel.check.js`, which reads the code of `parcel.js`; the three of an order made in the page (T-041.3, T-042.4) each start the stand-in for
+`pnpm sketch:check` finds the twelve checks by their names. Nine start nothing and read no
+file — but `parcel.check.js`, which reads the code of `parcel.js`, `ring.check.js`, which reads
+the code of `ring.js`, `geojson.check.js`, which reads the code of `geojson.js` (T-045.4), and
+`request-geojson.check.js`, which reads the code of `request.js`; the three of an order made in the page (T-041.3, T-042.4) each start the stand-in for
 swisstopo, as a process of its own on a port that the system picks, and ask nothing but this
 machine. The three of the server's `made.js` — `made.check.js`, `made-refused.check.js` and
 `made-disk.check.js` — went with it (T-041.4).
@@ -302,7 +408,9 @@ machine. The three of the server's `made.js` — `made.check.js`, `made-refused.
   parts, target and range, in that order, none beside another;
   of another day, the golden file with that day. The order marked on the photo gives
   `trial-slope-photo.json` byte for byte, and marked on the national map that golden but for
-  its credit and the first of its sources, each typed in (T-044.10). And of `making.js` and the seventeen modules it
+  its credit and the first of its sources, each typed in (T-044.10). The order taken from a file
+  gives `trial-slope-file.json` byte for byte, its credit typed in, and that golden is the
+  photo's but for its credit and the first of its sources (T-045.1). And of `making.js` and the seventeen modules it
   loads, to the last — what is loaded for what it does, as `squares.js`, among them — every
   import a module of the pad's, none of Node's; of `making.js` itself no `globalThis`, `Date`,
   `fetch`, `window`, `document`, `location` or `import(`
@@ -347,10 +455,47 @@ machine. The three of the server's `made.js` — `made.check.js`, `made-refused.
   repeated and the ring closed or not; of 1000 corners and of 1001; and of a corner past each
   edge of the sheet, one on its edge, three figures, a `Point` and every other geometry that is
   none. And of `parcel.js`'s code: no `globalThis`, `Date`, `fetch`, `window`, `document`,
-  `location` or `import(`, and its three imports, none of `map/`. **Tried broken 31 ways, one
+  `location` or `import(`, and its four imports, `ring.js` among them since T-045.2, none of
+  `map/`. **Tried broken 31 ways, one
   at a time** (T-043.3) — a guard left out, a limit moved, the closing corner kept, the largest
   part the smallest, a tag's expression widened: a check failed each time, after four cases
   were added that the first draft had not held
+- `tools/sketch/new-plot/ring.check.js` (T-045.2), the outline of a polygon by hand, rings in
+  LV95 from E 2 600 000, N 1 200 000: a square of 10 m with a hole of 2 m by 2 m and a second
+  part of 3 m by 3 m given before it — the square marked, by its area, and both sentences to
+  the letter, `9 m²` and `4 m²`; three parts, `13 m² in all`; two holes, `5 m² in all`; a ring
+  closed and the same left open, the same corners; a corner given three times running, taken
+  once; two parts that enclose alike, the first taken; figures to the centimetre as given;
+  nothing left out, `left` empty. And of `ring.js`'s code: `./frame.js` its one import
+- `tools/sketch/new-plot/geojson.check.js` (T-045.4), a GeoJSON read, of made-up GeoJSON built
+  in the check, no file read. The pentagon of `trial-slope.json` in LV95 — a `Feature`, a bare
+  `Polygon`, under each of the three names of LV95 and one with blanks around it, a `crs` of
+  null, a height on every position, left open, its third corner twice running, and inside a
+  collection whose feature names LV03, a `crs` not read — each time its five corners to the
+  figure. In WGS84, its corners typed in as T-045.0's trial turned them, to ten decimals: under
+  no `crs` and each of the seven names of WGS84, `lv95Of` of each and within `LV95_ACCURACY_M`
+  of the pentagon's, `wgs84` true, the two sentences. Refused, each to the letter: latitude
+  first, north first, LV03 by its figures, by each of its three names and by both; a `crs` of
+  LV95 over longitude and latitude, north first, LV03 and latitude first, one of WGS84 over LV95
+  and over no grid; no grid, and LV95 and WGS84 in one ring; `EPSG:3857`, `epsg:2056`, a name of
+  50 characters cut at 40, a `crs` with no name, a name that is a figure, a `crs` that is a
+  text, a blank name; a corner at E 2 950 000, and WGS84 that converts off the sheet; a corner
+  on each edge of `SHEET_WGS84`, converted off the sheet, and 0.01° past each, of no grid; a
+  ring on the sheet's south-west corner, taken; two corners; 1001, and 1000 taken; every
+  geometry that is no outline, a `Feature` of null, of a `Point` and of none, a collection with
+  none and an empty one; `{}`, `[]`, a text, null, a figure, a collection with no list, a type
+  that is none; two polygon features; no text, blanks, null, a figure; three texts that are no
+  JSON; 6 MB, and 5 MB to the byte taken and a byte more refused, of characters of one to four
+  bytes at the edge of each — `x`, U+007F, `é`, U+07FF, `€`, U+FFFF, an emoji — and a lone
+  surrogate, each counted as Node's encoder counts it; every way of coordinates that are none,
+  `1e400` among them. A `MultiPolygon` of the pentagon and a square of 3 m, `9 m²`; a hole of
+  2 m by 2 m, `4 m²`; a collection with two `Point`s and with one `LineString`, passed over. And
+  of `geojson.js`'s code, its comments out: no `globalThis`, `TextEncoder`, `fetch`,
+  `document`, `Date`, `window`, `import(` or `require(`, and its imports the six names of five
+  modules, and no other. **Tried broken 18 ways, one at a time** (T-045.4) — a name not trimmed,
+  the cap's edge, a byte count's edges, the sheet's check left out, latitude first not reversed,
+  the box's edge, a count passed over, the limits of corners, the LV03 `crs`, the cut of a name,
+  LV95 converted: a check failed each time, after the box's edges and the bytes' were added
 - `tools/sketch/new-plot/plot-parcel.check.js` (T-043.1), an order that names its parcel: read
   as given and changed, its four in order; every shape of a parcel that is none in the ninth
   sentence, after `on`'s, and a seventh field in the second; an order without one as before,
@@ -358,6 +503,17 @@ machine. The three of the server's `made.js` — `made.check.js`, `made-refused.
   makes up; the plot of a parcel's order on made-up level ground — its `credit` and its three
   kinds of source to the letter, as given and changed, with both credits under every `on` —
   and the rest of it the plot of the same corners by hand; and `enclosed` by hand.
+- `tools/sketch/new-plot/request-geojson.check.js` (T-045.1), an order whose corners came from a
+  file: read as given and changed, converted or not, its two in order, with `on` `[]` and with
+  a map; with a file, an `on` that is neither still the eighth; every shape of a file that is
+  none — a key missing, a third key, a text, null — in the tenth sentence, after the parcel's;
+  a parcel and a file, each one, in the eleventh; `on: []` without a file the eighth; an order
+  without one as before, with no `file`; and `request.js`'s code, which imports nothing.
+- `tools/sketch/new-plot/plot-geojson.check.js` (T-045.1), the plot of a file's order on made-up
+  level ground, as `plot-parcel.check.js` makes it: its `credit` and its first source to the
+  letter — the eight words, as given and changed, converted from WGS84 or not — with
+  `© swisstopo` alone, and both credits where `on` holds `cadastral`; no key and no word of the
+  file in the plot; and the rest of it the plot of the same corners by hand.
 - `tools/sketch/new-plot/frame.check.js`, the paper by hand: `longest`; of the card's eight hand cases every figure
   that the paper alone gives, the quarter said by hand — **case 1's third corner `[30, 12]`,
   where a mirrored plot has `[30, -12]`**; the sheet and the box of case 1, and by how little
@@ -472,12 +628,12 @@ that waits for the one before it once more, before it stands in line.
   identify's fields may stand in `properties` or in `attributes`**: the trial named the
   fields, not where they stand, and `parcel.js` reads both.
 - **A parcel's area is worked out from its first corner**: `enclosed` of figures of seven
-  digits multiplies two of them, some 3·10¹² — `parcel.js` takes each ring less its first
+  digits multiplies two of them, some 3·10¹² — `ring.js` (`parcel.js` until T-045.2) takes each ring less its first
   corner before it sums, so that the areas said are those of the corners, not of the
   rounding of a double.
-- `tools/sketch/new-plot/parcel.js` stands at 196 lines and `tools/sketch/new-plot/parcel.check.js` at 255 (T-043.3).
-- `tools/sketch/new-plot/frame.js` stands at 252 lines, `tools/sketch/new-plot/plot.js` at 231 and `tools/sketch/new-plot/request.js` at 196 (T-044.10), `tools/sketch/new-plot/frame.check.js` at 257 —
-  and **`tools/sketch/new-plot/plot.check.js` at 299** — `tools/sketch/new-plot/request.check.js` at 258, `tools/sketch/new-plot/making.check.js` at 168 (T-044.10) and
+- `tools/sketch/new-plot/parcel.js` stands at 160 lines and `tools/sketch/new-plot/parcel.check.js` at 260; `tools/sketch/new-plot/ring.js` at 63 and `tools/sketch/new-plot/ring.check.js` at 76 (T-045.2); `tools/sketch/new-plot/geojson.js` at 231 and **`tools/sketch/new-plot/geojson.check.js` at 299** (T-045.4): a case more of the reader wants a line made free first.
+- `tools/sketch/new-plot/frame.js` stands at 252 lines, `tools/sketch/new-plot/plot.js` at 256 and `tools/sketch/new-plot/request.js` at 221 (T-045.1), `tools/sketch/new-plot/frame.check.js` at 257 —
+  and **`tools/sketch/new-plot/plot.check.js` at 299** — `tools/sketch/new-plot/request.check.js` at 258, `tools/sketch/new-plot/making.check.js` at 187 (T-045.1) and
   `tools/sketch/new-plot/made-large.check.js` at 147 since T-041.4, and `tools/sketch/new-plot/plot-parcel.check.js` at 169: what is checked next of a plot wants a
   line made free first, or a check of its own. A check shares no helper: each says its corners
   and its ground itself, and each of the three of an order made starts the stand-in with lines

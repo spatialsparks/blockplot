@@ -215,7 +215,12 @@ and `egridOf` by hand; what `tools/sketch/routes.js` gives of the map's folder i
 rules. Beside the three hosts and 127.0.0.1 it lets two names of a kind of file through, which
 nobody asks, each to the letter: SVG's, `http://www.w3.org/2000/svg`, and KML's,
 `http://www.opengis.net/kml/2.2`, for the Google Earth file (T-016.1) — and refuses
-`http://www.opengis.net/kml/2.3` as a host it may not name. `tools/sketch/swisstopo/served.check.js` — the server itself, told its port alone
+`http://www.opengis.net/kml/2.3` as a host it may not name. It lets through, too, the four
+names of frames of a GeoJSON's `crs` that New plot's reader takes (`tools/sketch/new-plot/geojson.js`,
+T-045.4), each to the letter, typed in again: `http://www.opengis.net/def/crs/EPSG/0/2056`,
+`http://www.opengis.net/def/crs/OGC/1.3/CRS84`, `http://www.opengis.net/def/crs/EPSG/0/4326`
+and `http://www.opengis.net/def/crs/EPSG/0/21781` — and refuses
+`http://www.opengis.net/def/crs/EPSG/0/3857` as a host it may not name. `tools/sketch/swisstopo/served.check.js` — the server itself, told its port alone
 (T-041.4): the map's page under its own name alone, with no header of its own; and on the made-up
 pad that page a 204 with nothing, and nothing else of its folder.
 

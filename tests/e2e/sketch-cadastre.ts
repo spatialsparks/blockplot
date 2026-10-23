@@ -49,5 +49,5 @@ export const NEAR_GOLDEN = readFileSync(
   ),
   'utf8',
 );
-/** The pad's files that the map's page asks for besides the rest, where there is a cadastre: the parcel taken, and its addresses. */
+/** The pad's files that the map's page asks for besides the rest, where there is a cadastre: the parcel taken, and its addresses. Its outline's rule, new-plot/ring.js, every pad loads, for a file's outline (ST-045). */
 export const CADASTRE_FILES = ['map/take.js', 'new-plot/parcel.js', 'swisstopo/parcels.js'];

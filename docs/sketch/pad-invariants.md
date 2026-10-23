@@ -8,8 +8,9 @@
    where pnpm links it; a plain web server is given that folder beside the pages, as
    `tools/sketch/published.js` writes the pad into a folder outside the repository (T-044.2). No file of
    three.js is copied into the repository, and no address but this machine's is named anywhere
-   in the pad — but the three hosts of `tools/sketch/swisstopo/hosts.js`, below, and two names
-   of a kind of file, which nobody asks — SVG's and KML's. All else is plain scripts,
+   in the pad — but the three hosts of `tools/sketch/swisstopo/hosts.js`, below, two names
+   of a kind of file, which nobody asks — SVG's and KML's — and four names of frames, which
+   nobody asks either, GeoJSON's, in `tools/sketch/new-plot/geojson.js` (ST-045). All else is plain scripts,
    and a server of Node's own modules. The pad's own three pages ask
    nothing of another machine (directive 34) — and the third, the Info page, asks nobody at
    all, its own server neither: its policy is `connect-src 'none'`, and it reads the sketch

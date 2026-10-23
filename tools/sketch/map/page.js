@@ -4,11 +4,13 @@
 // is read of the address and what is said of it, with nothing of the page in it - page.check.js
 // reads it; then the page itself. Where the page asks nobody there is no map and no Find, and
 // the line says why. The page's one script: the others are loaded from here - and with the map
-// what is marked on it, marks.js, and what names the plot and makes it, make.js. A parcel taken
+// what is marked on it, marks.js, a GeoJSON file's outline taken onto it, file.js (ST-045), and
+// what names the plot and makes it, make.js. A parcel taken
 // onto those marks, take.js (ST-043), is the cadastre's: loaded, and its part of the side shown,
 // only where the pad offers the cadastre (docs/sketch/cadastre.md).
 import { CADASTRE } from '../swisstopo/cadastre.js';
 import { HOSTS, asksOf, mayAsk, policyOf } from '../swisstopo/hosts.js';
+import { openFile } from './file.js';
 import { openFind } from './find.js';
 import { openMake } from './make.js';
 import { openMap } from './map.js';
@@ -26,9 +28,9 @@ const SWISSTOPO = Object.freeze({
 // line of swisstopo twice, with the cadastre and without it, where it names no parcel.
 const SAID = {
   swisstopo:
-    'This page asks swisstopo, the Federal Office of Topography, for the pictures of the map that it shows, for the places that you search for, and for the parcel whose number or EGRID you type, or that you click with "Take the parcel under a click" on: the words that you typed, or the place that you clicked, are all that goes for it. When you make the plot, this page asks it for the heights of the ground under the plot. Nothing else goes out: no name, no sketch, nothing of your design.',
+    'This page asks swisstopo, the Federal Office of Topography, for the pictures of the map that it shows, for the places that you search for, and for the parcel whose number or EGRID you type, or that you click with "Take the parcel under a click" on: the words that you typed, or the place that you clicked, are all that goes for it. When you make the plot, this page asks it for the heights of the ground under the plot. Nothing else goes out: no name, no sketch, nothing of your design, and nothing of a GeoJSON file that you give, which is read in this page alone.',
   swisstopoAlone:
-    'This page asks swisstopo, the Federal Office of Topography, for the pictures of the map that it shows and for the places that you search for: the words that you typed are all that goes for it. When you make the plot, this page asks it for the heights of the ground under the plot. Nothing else goes out: no name, no sketch, nothing of your design.',
+    'This page asks swisstopo, the Federal Office of Topography, for the pictures of the map that it shows and for the places that you search for: the words that you typed are all that goes for it. When you make the plot, this page asks it for the heights of the ground under the plot. Nothing else goes out: no name, no sketch, nothing of your design, and nothing of a GeoJSON file that you give, which is read in this page alone.',
   standIn: (at) =>
     `This page asks a stand-in on this machine, ${at}, in the place of swisstopo: its map, its places and its ground are made up.`,
   nobody: 'It shows no map and makes no plot.',
@@ -61,7 +63,8 @@ export const whom = () => toldOf(asksOf(location.search));
 // The page: its policy first - a second one, beside the first of its markup, which names no host
 // - before a picture or a request is asked; then its line, and - where it asks somebody - Find
 // and the map, which lie hidden until then, with the marks on the map and the plot's side beside
-// it; the marks are opened once, for the parcel and the making alike. Where the pad offers the
+// it; the marks are opened once, for the file, the parcel and the making alike, and the file's
+// part on them in every pad that asks somebody. Where the pad offers the
 // cadastre, the parcel's part at the top of the side is shown, and the parcel opened, before the
 // making. What the body says of whom it asks comes last: by then the map stands.
 const $ = (id) => document.getElementById(id);
@@ -75,6 +78,7 @@ if (told.asks !== 'nobody') {
   const map = openMap(told.map);
   openFind(told.search, map);
   const marks = openMarks(map);
+  openFile(map, marks);
   if (CADASTRE !== null) {
     $('parcel-part').hidden = false;
     const { openTake } = await import('./take.js');

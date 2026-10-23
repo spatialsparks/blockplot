@@ -4,8 +4,9 @@
 // pictures of a view at the origin of the Swiss grid, and where each lies; nearer and further
 // with the place under the pointer kept under it; the first view; a view held to the sheet, at
 // its four corners, with the level's last column and row; the levels that there are none of;
-// which layer shows. And for every level from the first view's to the nearest, on views of
-// several places: the pictures of a view are the tiles of which it shows ground - said here a
+// which layer shows; where the map goes for an outline taken (`goesTo`, moved here from
+// take.check.js by T-045.2). And for every level from the first view's to the nearest, on views
+// of several places: the pictures of a view are the tiles of which it shows ground - said here a
 // second time, in other words - each lies where its ground lies, and each one's address is one
 // that tileAddress builds. Run by check.js.
 import assert from 'node:assert/strict';
@@ -13,7 +14,7 @@ import process from 'node:process';
 import { CADASTRAL_FROM, LAYERS, LEVELS, SHEET, TILE_PX } from '../swisstopo/hosts.js';
 import { matrixOf, tileAddress } from '../swisstopo/hosts.js';
 import { NEAREST, first, held, moved, pictures, pixelOf, placeAt } from './view.js';
-import { showing, stepped } from './view.js';
+import { SPARE_PX, goesTo, showing, stepped } from './view.js';
 
 // The map's own figures that the hand goes by, typed in: a picture of 256 pixels, the sheet, and
 // the metres of a pixel at the levels of the cases.
@@ -249,6 +250,30 @@ for (let level = first(PLACE).level; level <= NEAREST; level += 1) {
 assert.equal(none, PLACES.length * MIDDLES.length);
 assert.ok(kept >= 13 * PLACES.length * 2, `${kept}`);
 
+// The pixels that an outline taken has to spare on each side of the map, at the least, typed in.
+assert.equal(SPARE_PX, 20);
+// Where the map goes, by hand, in a map of 976 by 900 pixels. A parcel of 40 m: its middle, at
+// level 26 - 80 pixels and 40 to spare. One of 1 km: level 24, 1.5 m a pixel - 667 and 40 fit
+// in 900, where at level 25 1 000 and 40 do not. One of 4 000 km across: 1 000 pixels and 40
+// at 4 km a pixel, at no level - so the furthest. And 20 pixels on each side: 468 m by 10 m
+// is 936 pixels and 40 at level 26, and fits; 469 m is 938 and 40, and goes to level 25.
+const MAP = { wide: 976, high: 900 };
+const box = (side, up = side) => [
+  [2_600_000, 1_200_000],
+  [2_600_000 + side, 1_200_000],
+  [2_600_000 + side, 1_200_000 + up],
+  [2_600_000, 1_200_000 + up],
+];
+assert.deepEqual(goesTo(box(40), MAP), { e: 2_600_020, n: 1_200_020, level: 26 });
+assert.deepEqual(goesTo(box(1000), MAP), { e: 2_600_500, n: 1_200_500, level: 24 });
+assert.equal(goesTo(box(468, 10), MAP).level, 26);
+assert.equal(goesTo(box(469, 10), MAP).level, 25);
+const WIDE = [
+  [0, 0],
+  [4_000_000, 10],
+];
+assert.deepEqual(goesTo(WIDE, MAP), { e: 2_000_000, n: 5, level: 0 });
+
 process.stdout.write(
-  'tools/sketch/map: a view of the map by hand - the place under a pixel, the pictures of a view and where each lies, nearer and further at the pointer, the first view, the sheet held, and which layer shows\n',
+  'tools/sketch/map: a view of the map by hand - the place under a pixel, the pictures of a view and where each lies, nearer and further at the pointer, the first view, the sheet held, which layer shows, and where the map goes for an outline taken\n',
 );
