@@ -1,0 +1,277 @@
+/* The page of a new plot (ST-031): what it has beside the frame of the pad's pages, frame.css,
+   whose look it takes - the custom properties there, a control, a side. The head of the page, a
+   side left and right of the map, the map with what lies on it, and the line of what the page
+   asks. No picture is written into this file and none is named: the page's policy takes
+   pictures from the pad's own server and from the map service, and from nowhere else. No gate
+   counts its lines: it stays under 300, counted by hand. */
+
+/* The head: the way back, Find, and after them the page's name. One line of plain controls -
+   no group and no square: this page has no drawings for them. The parcel's form, at the top of
+   the plot's side, is laid as Find's is, its field the side's width and its button under it. */
+header {
+  align-items: center;
+  padding: 8px 10px;
+}
+#find,
+#parcel {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+#find-words {
+  width: 26em;
+  max-width: 50vw;
+}
+#parcel {
+  flex-wrap: wrap;
+}
+#find button,
+#parcel button {
+  height: 28px;
+  background: var(--grey);
+}
+#find button:hover,
+#parcel button:hover {
+  background: var(--grey-over);
+}
+h1 {
+  margin: 0 0 0 auto;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* The two sides, always there and as wide, so that the map does not move when a place is found
+   or a corner marked. Together they leave the map more than 960 pixels of a window of 1440: the
+   whole sheet shows there at 500 m a pixel. */
+#found {
+  flex: none;
+  width: 224px;
+  border-right: 1px solid var(--hair);
+}
+#plot {
+  flex: none;
+  width: 240px;
+  border-left: 1px solid var(--hair);
+}
+/* A place that was found is a button with its name, which breaks into lines. The one that the
+   map went to lies in a band of the grey. So is a parcel that the search listed, and the one
+   that was picked. */
+#places button,
+#parcels button {
+  display: block;
+  width: 100%;
+  margin: 2px 0;
+  padding: 6px 8px;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+#places button[aria-current],
+#parcels button[aria-current] {
+  background: var(--grey);
+}
+#places button[aria-current]:hover,
+#parcels button[aria-current]:hover {
+  background: var(--grey-over);
+}
+
+/* The map: a place of plain ground, which its pictures cover as they come. A picture is 256
+   pixels each way and lies where map.js lays it; the pointer is the map's, not a picture's. */
+#map {
+  flex: 1;
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+  background: var(--grey);
+}
+#tiles {
+  position: absolute;
+  inset: 0;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+#tiles:active {
+  cursor: grabbing;
+}
+#tiles img {
+  position: absolute;
+  width: 256px;
+  height: 256px;
+  max-width: none;
+  pointer-events: none;
+}
+/* The marks of the plot (marks.js): a drawing over the map's pictures, in the ink, with a light
+   edge round it - so that it shows on the cadastral map and on the aerial photo alike. It takes
+   no pointer: the map under it is clicked and dragged as ever. A corner's mark alone takes it,
+   and that only from as near as a corner is set - there the mark is dragged, and not the map.
+   The paper is a broken line, the outline a line round a faint tint, and the side that the
+   paper lies along is drawn stronger. */
+#marks {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  filter: drop-shadow(0 0 1px #fff) drop-shadow(0 0 1px #fff);
+}
+#marks * {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+#sheet {
+  stroke-width: 1.5;
+  stroke-dasharray: 7 6;
+}
+#outline {
+  fill: rgb(31 41 51 / 0.1);
+}
+#along {
+  stroke-width: 5;
+}
+#dots circle {
+  fill: var(--paper);
+}
+#marks.near #dots circle {
+  pointer-events: auto;
+  touch-action: none;
+  cursor: move;
+}
+/* What lies on the map has a ground of its own, the paper's, and a soft shadow: a control is
+   found on whatever the map shows under it, and a word is read there. What is pressed has the
+   ink, as everywhere. */
+#map button,
+#said,
+#plain {
+  background: var(--paper);
+  box-shadow: 0 1px 4px rgb(31 41 51 / 0.3);
+}
+#map button:hover {
+  background: var(--grey);
+}
+#map button[aria-pressed='true'] {
+  background: var(--ink);
+}
+#photo {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  height: 32px;
+}
+/* A word that stands while the cadastral map shows, and at no other time (T-031.8): that map
+   can come as empty pictures, which the page cannot tell from drawn ones - so it says what
+   plain ground means there, and what shows the same ground. This rule shows it, by what the
+   body says of the layer, and no script does. It lies under the switch, 6 pixels from its foot
+   - however wide a font makes the switch - and ends 20 pixels before the two steps, however
+   narrow the map: quiet words on a ground of their own. No pointer is its own: a click and a
+   drag on it are the map's, and the marks of the plot are drawn over it. */
+#plain {
+  display: none;
+  position: absolute;
+  top: 48px;
+  left: 10px;
+  max-width: min(32em, 100% - 72px);
+  margin: 0;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  color: var(--faint);
+  pointer-events: none;
+}
+body[data-shows='cadastral'] #plain {
+  display: block;
+}
+#steps {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+#steps button {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  font-size: 18px;
+  line-height: 1;
+}
+/* A picture that did not come is said over the map's foot, above the credits. */
+#said {
+  position: absolute;
+  left: 10px;
+  bottom: 32px;
+  max-width: calc(100% - 20px);
+  margin: 0;
+  padding: 6px 10px;
+  border-radius: 6px;
+}
+/* The credits stand at the map's foot, clearly and under nothing: on a ground of their own,
+   over whatever is laid on the map, and they take no click of the map's. */
+#credits {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  z-index: 5;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 12px;
+  padding: 2px 8px;
+  font-size: 11px;
+  background: var(--paper);
+  pointer-events: none;
+}
+
+/* The plot's side: what is said of the corners and of the paper, each with its controls in a
+   row under it, and the name with what makes the plot. A control there has the light grey for
+   its ground, as Find's has - but one that is off, which has none, and a parcel listed, which
+   looks as a place of Find does. Words of a service or of the disk may be long and have no
+   blank: they break where the side ends. */
+#plot .row {
+  display: flex;
+  gap: 4px;
+  margin: 6px 0;
+}
+#plot button:enabled:not(#parcels *) {
+  background: var(--grey);
+}
+#plot button:enabled:not(#parcels *):hover {
+  background: var(--grey-over);
+}
+#plot label {
+  display: block;
+  margin: 6px 0;
+  font-size: 12px;
+  color: var(--faint);
+}
+/* The figure of the ground around: as wide as its four signs and its two arrows want, so that
+   the words after it have room on its line - in the font of this machine: in a wider one they
+   break, and stay in the side. */
+#around {
+  width: 56px;
+  padding: 0 0 0 8px;
+}
+#parcel-words,
+#name,
+#make {
+  width: 100%;
+}
+#make {
+  height: 32px;
+}
+#plot p {
+  overflow-wrap: anywhere;
+}
+
+/* The line of what the page asks: quiet words under the map, the whole width. A line of it is
+   a whole number of pixels high, as the head is: the map lies on whole pixels of the screen. */
+#asks {
+  padding: 6px 12px;
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--faint);
+  background: var(--paper);
+  border-top: 1px solid var(--hair);
+}

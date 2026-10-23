@@ -1,0 +1,19 @@
+# The workspace, and every pnpm setting. pnpm reads only auth and registry settings from .npmrc,
+# so there is no .npmrc here.
+
+packages:
+  # The sketch pad: plain scripts with one dependency, three.js, which its own server hands to
+  # its page out of the pad's node_modules.
+  - tools/sketch
+
+# Exact versions: `pnpm add` writes 1.2.3, never ^1.2.3.
+savePrefix: ''
+
+# A version must have been public for a day before it can be installed. Naming the value turns
+# the rule strict: a version that is too new fails the install instead of slipping through.
+minimumReleaseAge: 1440
+
+# Install scripts by allowlist. A dependency that wants to run code at install time fails the
+# install until it has an entry here - true after someone has read the script, false when the
+# package works without it. Each entry says which, and why.
+allowBuilds: {}

@@ -1,0 +1,41 @@
+{
+  "format": "blockplot/plot",
+  "version": 4,
+  "name": "Made-up corner",
+  "cellM": 0.5,
+  "bearingDeg": 0,
+  "xFromM": 0,
+  "xToM": 2,
+  "yFromM": 0,
+  "yToM": 2,
+  "sideM": [
+    100,
+    102
+  ],
+  "outline": [
+    [
+      0,
+      0
+    ],
+    [
+      0,
+      2
+    ],
+    [
+      2,
+      2
+    ]
+  ],
+  "notes": [],
+  "ground": {
+    "baseM": 100,
+    "rowsCm": [
+      "100 100 100 100 100",
+      "100 100 100 100 100",
+      "100 100 100 100 100",
+      "100 100 100 100 100",
+      "100 100 100 100 100"
+    ]
+  },
+  "credit": "A made-up plot, for tests: no real property, no measured ground."
+}

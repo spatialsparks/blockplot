@@ -1,0 +1,15 @@
+{
+  "format": "blockplot/plot",
+  "version": 1,
+  "name": "Made-up corner",
+  "cellM": 0.5,
+  "bearingDeg": 0,
+  "xFromM": 0,
+  "xToM": 2,
+  "yFromM": 0,
+  "yToM": 2,
+  "sideM": [
+    100,
+    102
+  ],
+  "outline": [

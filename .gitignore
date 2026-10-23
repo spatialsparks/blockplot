@@ -1,0 +1,4 @@
+# What an install, the browser tests and their report write: never committed.
+node_modules/
+test-results/
+playwright-report/

@@ -1,0 +1,10 @@
+# LF in the repository and in every working tree, whatever core.autocrlf says on the machine.
+# Stored formats are compared byte for byte and the formatter checks for LF: a checkout that
+# rewrote files to CRLF would fail both.
+* text=auto eol=lf
+
+# But what lies under a `__fixtures__/` folder is kept byte for byte, in the repository and in
+# every working tree: a recorded response keeps the line ends its service sent, CRLF too, and a
+# golden file the bytes its encoder wrote. It has to be `-text`, never convert: with `text` only
+# left unspecified, the line above and core.autocrlf would decide again.
+**/__fixtures__/** -text

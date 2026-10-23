@@ -1,0 +1,280 @@
+/* The frame of the pad's pages, index.html, 3d.html, info.html, and their one look (ST-029): the
+   page itself, the toolbar and a group of it, a control and what it is marked with, a menu, and
+   what stands beside the paper or the stage. What one page alone has is in that page's own
+   stylesheet, which takes the look from the custom properties here; the small drawings are
+   icons.css's. The pad's server gives this file as it gives a page and a script (routes.js);
+   opened from its file, index.html finds it beside itself. No gate counts its lines: it stays
+   under 300, counted by hand. */
+* {
+  box-sizing: border-box;
+}
+/* What is hidden stays hidden, whatever else is said of how it shows. */
+[hidden] {
+  display: none !important;
+}
+/* The look, said once. Neutral, so that the drawing has the colours: white, greys and the
+   page's ink, and no accent colour. The ink is the words, and the ground of what is chosen;
+   the faint ink a group's name and a quiet word; `--off` the words of what is off. The light
+   grey is a track, a band, and what the pointer is over - a step darker, `--over`, where the
+   ground under it is the light grey already. */
+:root {
+  --ink: #1f2933;
+  --faint: #52606d;
+  --off: #9aa5b1;
+  --paper: #fff;
+  --hair: #d5dae0;
+  --grey: #eef0f3;
+  --grey-over: #e0e4e9;
+  --shadow: 0 8px 24px rgb(31 41 51 / 0.16), 0 1px 4px rgb(31 41 51 / 0.1);
+}
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+body {
+  display: flex;
+  flex-direction: column;
+  font:
+    13px/1.4 system-ui,
+    sans-serif;
+  color: var(--ink);
+  background: #e5e7eb;
+  accent-color: var(--ink);
+}
+/* The toolbar: a ribbon with nothing hidden. A line of it is 68 pixels, whatever stands on it:
+   54 for the controls of a group and 14 for the group's name under them. So the toolbar is a
+   whole number of pixels high, however many lines it breaks into - 74 a line, and 5 - and what
+   lies under it begins on a pixel of the screen (ADR-0090). */
+header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 6px 17px;
+  padding: 6px 10px 4px;
+  line-height: 18px;
+  background: var(--paper);
+  border-bottom: 1px solid var(--hair);
+}
+/* Things in a row: a row of controls wherever it stands. */
+.group {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+/* A group of the toolbar is a direct child of it. The toolbar breaks into lines between its
+   groups and never inside one, and every group is as high, whatever it holds: two rows of
+   controls, of which a thing takes both unless its page says that it is a lesser one. */
+header > .group {
+  position: relative;
+  display: inline-grid;
+  grid-template-rows: 1fr 1fr;
+  grid-auto-flow: column dense;
+  gap: 2px;
+  height: 54px;
+  margin-bottom: 14px;
+}
+header > .group > * {
+  grid-row: 1 / 3;
+}
+/* The small word under a group is the group's name, said once: its label. No label, no word. */
+header > .group[aria-label]::before {
+  content: attr(aria-label);
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  font-size: 11px;
+  line-height: 14px;
+  text-align: center;
+  white-space: nowrap;
+  color: var(--faint);
+}
+/* A thin upright line closes a group: between two, it stands in the middle of their gap. */
+header > .group::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: -9px;
+  bottom: -14px;
+  width: 1px;
+  background: var(--hair);
+}
+/* The words that name the plot, or the slice: the toolbar's last thing, beside the controls.
+   They take what is left of the line, 4em at the least - less than they had, for the switch has
+   seven views (T-032.5) and the pad has Distances (T-036.3) - and break into lines of their own
+   - three have room - before they take one of the toolbar's. So the pad's toolbar is one line
+   from 1278 pixels on, from above, and from 1172 standing up, the 3D page's from 1276 and the
+   Info page's from under 900: measured in the tests' browser, on the made-up plot. */
+#title {
+  flex: 1 1 4em;
+  display: flex;
+  align-items: center;
+  align-items: safe center;
+  min-width: 0;
+  height: 54px;
+  margin-bottom: 14px;
+  overflow: hidden;
+  text-wrap: balance;
+}
+/* A control has no box: no border and no ground of its own. It is found by its word and by
+   the pointer - a light grey under it - and by the ring of the keyboard. */
+button,
+select,
+nav a {
+  font: inherit;
+  padding: 3px 8px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+button:hover,
+select:hover,
+nav a:hover {
+  background: var(--over, var(--grey));
+}
+/* What is off has faint words, and is no thing to click. */
+button:disabled {
+  background: none;
+  color: var(--off);
+  cursor: default;
+}
+/* What is chosen has the ink, with white words, and nothing else has: what is pressed, what
+   is open, and the view that shows. */
+button[aria-pressed='true'],
+button[aria-expanded='true'],
+nav a[aria-current] {
+  background: var(--ink);
+  color: #fff;
+}
+/* What the keyboard has shows it: a ring of 2 pixels in the ink, a pixel off its edge. */
+:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 1px;
+}
+/* A field for a figure is a quiet band: the light grey for its ground, and no box. */
+input:is([type='number'], [type='text']) {
+  height: 28px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 6px;
+  background: var(--grey);
+  font: inherit;
+  color: inherit;
+}
+/* A main control is a square, a small drawing over its word (icons.css): a button that stands
+   in a group of the toolbar, or in the toolbar itself, and a link of the switch. A word that
+   is too long for its square breaks into two lines. */
+header > .group > button,
+header > button,
+#views a {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  width: 48px;
+  height: 50px;
+  padding: 3px 0 0;
+  font-size: 11px;
+  line-height: 12px;
+  text-align: center;
+}
+/* A button of the toolbar itself stands on the line of the controls, in the middle of it. */
+header > button {
+  margin: 2px 0 16px;
+}
+/* Choices that exclude each other stand in one track: a band of the light grey round its
+   parts, 2 pixels of it showing. The switch of views is one on every page; the ways and the
+   stands are 3d.html's. */
+#views,
+#ways,
+#stands {
+  --over: var(--grey-over);
+  gap: 2px;
+  height: 54px;
+  padding: 2px;
+  border-radius: 8px;
+  background: var(--grey);
+}
+/* A view is two words, one under the other: a blank between two is wider than the square. */
+#views a {
+  word-spacing: 48px;
+}
+/* A menu floats: the part that a button opens (views.js) is a panel with soft corners and a
+   soft shadow, its entries one under the other. It lies under its button and over what lies
+   below that, and takes no room: the toolbar is as high and as wide with a menu open as with
+   it shut. */
+.menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  min-width: 12em;
+  padding: 6px;
+  background: var(--paper);
+  border: 1px solid var(--hair);
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+}
+.menu button {
+  height: 30px;
+  padding: 0 10px;
+  text-align: left;
+  white-space: nowrap;
+}
+/* A small word over the entries that follow it, as the word of a group of the toolbar is - and
+   under an entry that is off, the line that says why: no wider than the entries. */
+.menu small {
+  width: 0;
+  min-width: 100%;
+  padding: 2px 10px;
+  font-size: 11px;
+  line-height: 14px;
+  color: var(--faint);
+}
+/* A hairline between two parts of a menu: over the word of the entries that follow. */
+.menu button + small {
+  margin-top: 6px;
+  padding-top: 8px;
+  border-top: 1px solid var(--hair);
+}
+/* Where a control is of no use it is not seen, and keeps its place: the toolbar is as high
+   with it as without, and what lies under it as large. */
+header .away {
+  visibility: hidden;
+}
+/* Under the toolbar: the paper or the stage, and beside it a side or two. A side scrolls for
+   itself. How wide it is, and where its line toward the paper lies, each page says. A side is
+   quiet: a small faint heading, and rows without lines between them. */
+#work {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+}
+aside {
+  overflow: auto;
+  padding: 8px 12px;
+  background: var(--paper);
+}
+aside h2 {
+  margin: 8px 0 4px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 16px;
+  color: var(--faint);
+}
+aside p {
+  margin: 6px 0;
+  color: var(--faint);
+  font-size: 12px;
+}
+aside ul {
+  margin: 6px 0;
+  padding: 0;
+  list-style: none;
+}

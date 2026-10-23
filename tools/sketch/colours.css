@@ -1,0 +1,94 @@
+/* The colours of the pad's own page (palette.js, swatch.js). In the toolbar's `#palette` the
+   colour to draw with, `#colour`, a round button that shows pressed with a ring, and the small
+   arrow beside it, `#colours-open`, which opens the colours, `#colours`: a menu that floats
+   from `#palette`, the eleven round in two rows, then the owner's colours, `#own-colours`, a row
+   each of a round swatch and its name - more than eight scroll in the list, the rest of the menu
+   where it stands - and "Add a colour", a label round the browser's chooser. Beside the paper
+   the colours of the swatch, `#swatch-palette`, which hang from its row in a panel that floats,
+   in two rows as the toolbar's menu has them - the swatch itself as round as they are, its own
+   colour marked. index.html names this file in the line after pad.css, and the row that holds
+   the swatch stays there, with the rule it shares with the other rows of what is selected. No
+   gate counts its lines: it stays under 300, counted by hand. */
+#palette {
+  position: relative;
+  gap: 2px;
+  padding: 0 4px;
+}
+#colour,
+#colours .eleven button,
+#swatch-palette button,
+#swatch,
+#own-colours i {
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border-radius: 50%;
+}
+#colours-open {
+  height: 18px;
+  padding: 0 4px;
+  font-size: 11px;
+  line-height: 18px;
+}
+:is(#colour, #colours .eleven button, #swatch-palette button, #swatch):hover {
+  box-shadow: 0 0 0 3px var(--grey-over);
+}
+#colour[aria-pressed='true'],
+:is(#colours, #swatch-palette) button[aria-current] {
+  box-shadow:
+    0 0 0 2px var(--paper),
+    0 0 0 4px var(--ink);
+}
+#colours .eleven,
+#swatch-palette {
+  display: grid;
+  grid-template-columns: repeat(6, 18px);
+  gap: 8px;
+  padding: 6px;
+}
+#swatch-palette {
+  padding: 12px;
+}
+/* The owner's colours: one under the other, eight rows of 30 pixels to be seen, and the rest
+   scrolled to. A row is the button that picks the colour, as wide as it can be, and its ×. */
+#own-colours {
+  max-height: 240px;
+  margin: 6px 0 0;
+  padding: 6px 0 0;
+  overflow-y: auto;
+  list-style: none;
+  border-top: 1px solid var(--hair);
+}
+#own-colours li {
+  display: flex;
+}
+#own-colours li > button:first-child {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 8px;
+}
+#own-colours li > button:first-child[aria-current] {
+  box-shadow: inset 0 0 0 2px var(--ink);
+}
+#own-colours i {
+  flex: none;
+}
+#colours .colour-add {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+  padding: 8px 10px 0;
+  border-top: 1px solid var(--hair);
+  white-space: nowrap;
+  cursor: pointer;
+}
+#colour-chooser {
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}

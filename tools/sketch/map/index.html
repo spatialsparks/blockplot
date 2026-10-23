@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+  <!-- The page of a new plot (ST-031): a plot marked on a map of swisstopo's. Its policy is the
+       page's own, for a plain file server sends no header (ST-041): a first one here, in force
+       from the first byte, that names no host; and a second that page.js puts in beside it,
+       before it asks anything, with whom its address names. So no script, no style and no
+       handler is written into a tag here. Every script is a module, and every stylesheet a file
+       of the pad. -->
+  <head>
+    <meta charset="utf-8" />
+    <meta name="referrer" content="no-referrer" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="script-src 'self'; style-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'"
+    />
+    <title>New plot - Sketch pad</title>
+    <!-- The frame that the pad's pages share: the page itself, its head, a control, a side, and
+         the look's figures. Then what this page alone has. Not icons.css: its drawings are
+         pictures written out as data, which this page's policy does not take. -->
+    <link rel="stylesheet" href="../frame.css" />
+    <link rel="stylesheet" href="map.css" />
+  </head>
+  <body>
+    <!-- The head of the page: the way back to the pad - the plot that the owner came from,
+         where the page was opened under a plot's address - and Find. Find and the map lie
+         hidden until page.js knows whom the pad asks: a pad that asks nobody shows neither. -->
+    <header>
+      <nav><a id="back" href="../">Back to the pad</a></nav>
+      <form id="find" role="search" hidden>
+        <input
+          id="find-words"
+          type="text"
+          maxlength="80"
+          autocomplete="off"
+          spellcheck="false"
+          aria-label="Find an address or a place"
+          placeholder="An address or a place"
+        />
+        <button type="submit">Find</button>
+      </form>
+      <h1>New plot</h1>
+    </header>
+    <div id="work" hidden>
+      <!-- Left of the map: what Find says, and the places that it found, a button a place. -->
+      <aside id="found">
+        <h2>Places</h2>
+        <p id="find-said" role="status"></p>
+        <div id="places"></div>
+      </aside>
+      <!-- The map (map.js): its pictures; on them a word that stands while the cadastral map
+           shows, and at no other time - map.css shows it, by what the body says of the layer,
+           and no script touches it: a constant of this page, and no word of a service; where the
+           pad offers no cadastre it never shows, and stays here all the same. Over both
+           the marks of the plot (marks.js) - its paper, its outline, the side that the paper lies
+           along, and a mark a corner; and on those what is said on the map, the two buttons, the
+           switch to the aerial photo, and the credits, under nothing. -->
+      <div id="map">
+        <div id="tiles"></div>
+        <p id="plain">
+          Plain ground? The cadastral map has no picture here, or is not answering: the aerial photo
+          shows the same ground.
+        </p>
+        <svg id="marks" aria-hidden="true">
+          <polygon id="sheet" />
+          <polygon id="outline" />
+          <line id="along" hidden />
+          <g id="dots" />
+        </svg>
+        <p id="said" role="status" hidden></p>
+        <button id="photo" type="button" aria-pressed="false" title="The aerial photo, and back">
+          Aerial photo
+        </button>
+        <div id="steps">
+          <button id="nearer" type="button" aria-label="Nearer" title="Nearer (+)">+</button>
+          <button id="further" type="button" aria-label="Further" title="Further (-)">
+            &minus;
+          </button>
+        </div>
+        <div id="credits"></div>
+      </div>
+      <!-- Right of the map: the plot that is marked on it. First the parcel that may be taken
+           for it, take.js's: a municipality and a number, or an EGRID, found; the switch that
+           has a click take the parcel under it; what is said, and the parcels listed, a button
+           a parcel. The field's limit is the script's. Then its corners and its paper, as
+           marks.js says them; then its name, the folder that it will get and what makes it,
+           make.js's. What a part says is written by its script, as text. -->
+      <aside id="plot">
+        <!-- The parcel is the cadastre's (docs/sketch/cadastre.md): it lies hidden, and page.js
+             shows it and loads take.js only where the pad offers the cadastre. Where it does
+             not - Blockplot - the side begins at Corners. One markup for both: a page of its own
+             would drift from this one. -->
+        <div id="parcel-part" hidden>
+          <h2>Parcel</h2>
+          <form id="parcel">
+            <input
+              id="parcel-words"
+              type="text"
+              autocomplete="off"
+              spellcheck="false"
+              aria-label="A municipality and a parcel number, or an EGRID"
+              placeholder="Bern 1234, or CH…"
+            />
+            <button type="submit">Find the parcel</button>
+          </form>
+          <label><input id="take-parcel" type="checkbox" /> Take the parcel under a click</label>
+          <p id="parcel-said" role="status"></p>
+          <div id="parcels"></div>
+        </div>
+        <h2>Corners</h2>
+        <p id="corners-said" role="status"></p>
+        <p id="no-survey" hidden></p>
+        <div class="row">
+          <button id="undo-corner" type="button" disabled>Undo corner</button>
+          <button id="start-again" type="button" disabled>Start again</button>
+        </div>
+        <h2>Paper</h2>
+        <p id="paper-said" role="status"></p>
+        <div class="row">
+          <button id="side-before" type="button" disabled>Side before</button>
+          <button id="side-next" type="button" disabled>Next side</button>
+        </div>
+        <label><input id="around" type="number" /> m of ground around the plot</label>
+        <h2>Name</h2>
+        <form id="naming">
+          <input
+            id="name"
+            type="text"
+            autocomplete="off"
+            spellcheck="false"
+            aria-label="The name of the plot"
+            placeholder="A name for the plot"
+          />
+          <p id="folder"></p>
+          <button id="make" type="submit" disabled>Make the plot</button>
+        </form>
+        <p id="make-said" role="status"></p>
+      </aside>
+    </div>
+    <!-- The line that says what this page asks of swisstopo (page.js). -->
+    <footer id="asks"></footer>
+    <script type="module" src="page.js"></script>
+  </body>
+</html>

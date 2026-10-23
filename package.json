@@ -1,0 +1,24 @@
+{
+  "name": "blockplot",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@12.3.4",
+  "devEngines": {
+    "runtime": {
+      "name": "node",
+      "version": "24.21.0",
+      "onFail": "download"
+    }
+  },
+  "scripts": {
+    "sketch": "node tools/sketch/serve.js",
+    "sketch:check": "node tools/sketch/check.js",
+    "sketch:look": "node tools/sketch/look.js",
+    "sketch:kml": "node tools/sketch/kml/try.js",
+    "sketch:published": "node tools/sketch/published.js",
+    "e2e:sketch": "playwright test --config playwright.sketch.config.ts"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0"
+  }
+}
