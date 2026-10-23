@@ -11,7 +11,10 @@
 // aerial photo, a second golden file, tests/__fixtures__/new-plot/trial-slope-photo.json, which
 // plotMadeOf wrote once (T-044.10): byte for byte the first but for its credit and the first of
 // its sources; and marked on the national map, as Blockplot marks one, the photo's golden but for
-// those two, typed in. What is refused is making-refused.check.js's. Nothing is asked but this machine, and nothing is written.
+// those two, typed in. And of the pentagon taken from a GeoJSON file, a third golden file,
+// tests/__fixtures__/new-plot/trial-slope-file.json, which plotMadeOf wrote once (T-045.1): the
+// photo's golden but for those two. What is refused is making-refused.check.js's. Nothing is
+// asked but this machine, and nothing is written.
 import '../offline.js';
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
@@ -28,6 +31,7 @@ const PAD = path.join(import.meta.dirname, '..');
 const FIXTURES = path.join(PAD, '..', '..', 'tests', '__fixtures__', 'new-plot');
 const GOLDEN = path.join(FIXTURES, 'trial-slope.json');
 const PHOTO = path.join(FIXTURES, 'trial-slope-photo.json');
+const FILE = path.join(FIXTURES, 'trial-slope-file.json');
 const DAY = '2026-10-20';
 // The pentagon's order, as the map's page writes it: to the letter the server's first hand case.
 const ORDER =
@@ -120,6 +124,21 @@ try {
   const FIRST = /("credit": )"[^"]*"(,\n {2}"sources": \[\n {4})"[^"]*"/;
   const unsaid = (text) => text.replace(FIRST, '$1…$2…');
   assert.ok(unsaid(photo) !== photo && unsaid(onNational.text) === unsaid(photo));
+
+  // Taken from a GeoJSON file, its corners as given and marked on nothing (ST-045): its golden
+  // file, tests/__fixtures__/new-plot/trial-slope-file.json, which plotMadeOf wrote once (T-045.1),
+  // byte for byte - the photo's golden but for its credit and the first of its sources.
+  const fromFile = await plotMadeOf(
+    ORDER.replace('["cadastral"]', '[],"file":{"wgs84":false,"asGiven":true}'),
+    { origin: AT, day: DAY },
+  );
+  const file = fs.readFileSync(FILE, 'utf8');
+  assert.ok(fromFile.text === file, 'plotMadeOf gave another text than the golden one of a file');
+  assert.equal(
+    JSON.parse(file).credit,
+    'Outline: from a file you gave, no survey. Ground: swissALTI3D. © swisstopo',
+  );
+  assert.ok(unsaid(file) !== file && unsaid(file) === unsaid(photo));
 } finally {
   standIn.kill();
 }

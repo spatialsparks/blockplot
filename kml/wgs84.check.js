@@ -1,9 +1,19 @@
-// The check of wgs84.js: the conversion from LV95 to WGS84 held against published reference
-// points. Every reference value below says where it came from. It asks nobody: it runs behind
-// the pad's gate, and what swisstopo's REFRAME gave was asked by hand, once, and typed in.
+// The check of wgs84.js: the conversions from LV95 to WGS84 and back held against published
+// reference points. Every reference value below says where it came from. It asks nobody: it runs
+// behind the pad's gate, and what swisstopo's REFRAME gave was asked by hand, once, and typed in.
 import assert from 'node:assert/strict';
 import process from 'node:process';
-import { ACCURACY_M, EARTH_RADIUS_M, SECOND_M, STATED_SECONDS, wgs84Of } from './wgs84.js';
+import { SHEET } from '../swisstopo/hosts.js';
+import {
+  ACCURACY_M,
+  EARTH_RADIUS_M,
+  LV95_ACCURACY_M,
+  SECOND_M,
+  SHEET_WGS84,
+  STATED_SECONDS,
+  lv95Of,
+  wgs84Of,
+} from './wgs84.js';
 
 /** Degrees, minutes and seconds as one figure of degrees. */
 const degrees = (whole, minutes, seconds) => whole + minutes / 60 + seconds / 3600;
@@ -58,6 +68,75 @@ assert.ok(Math.abs(gapM([0, 0], [0.01, 0]) - 36 * SECOND_M) < 1e-6);
 assert.deepEqual(STATED_SECONDS, { longitude: 0.12, latitude: 0.08 });
 assert.ok(Math.abs(ACCURACY_M - 4.4547) < 0.0001, `${ACCURACY_M}`);
 
+// And the other way, section 1 of the same document, page 3. The gap between two places of LV95
+// is the length between them, in metres.
+const gapLV95 = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]);
+
+// Its worked example: given phi = 46° 02' 38.87" and lambda = 8° 43' 49.79", it prints
+// E = 2 699 999.76 m and N = 1 099 999.97 m - what the formulas give, not its "Sollwerte" - and
+// the formula is held to that within half its last figure, 0.005 m.
+const BACK = lv95Of([degrees(8, 43, 49.79), degrees(46, 2, 38.87)]);
+const PRINTED_LV95 = [2_699_999.76, 1_099_999.97];
+BACK.forEach((value, at) => {
+  const off = Math.abs(value - PRINTED_LV95[at]);
+  assert.ok(off <= 0.005, `${['east', 'north'][at]}: ${off} m off`);
+});
+
+// Bern, longitude 26 782.5" and latitude 169 028.66": lambda' and phi' are 0, and the formulas'
+// constant terms give it alone - E 2 600 072.37, N 1 200 147.07.
+const BERN = lv95Of([26_782.5 / 3600, 169_028.66 / 3600]);
+assert.ok(Math.abs(BERN[0] - 2_600_072.37) < 1e-6, `${BERN[0]}`);
+assert.ok(Math.abs(BERN[1] - 1_200_147.07) < 1e-6, `${BERN[1]}`);
+
+// The page states "besser als 1 Meter in der Lage", under section 1's example.
+assert.equal(LV95_ACCURACY_M, 1);
+// The three points of REFRAME, the other way: each exact WGS84 within LV95_ACCURACY_M of its LV95.
+for (const { where, lv95, wgs84 } of REFRAME) {
+  const gap = gapLV95(lv95Of(wgs84), lv95);
+  assert.ok(gap <= LV95_ACCURACY_M, `${where}: ${gap} m from its LV95, more than a metre`);
+}
+// A round trip, lv95Of(wgs84Of(p)): the made-up pentagon's five corners, each within
+// LV95_ACCURACY_M, and the three places of REFRAME within the two accuracies together.
+const PENTAGON = [
+  [2_600_020, 1_200_010],
+  [2_600_038, 1_200_034],
+  [2_600_028.4, 1_200_041.2],
+  [2_600_010, 1_200_030],
+  [2_600_004, 1_200_022],
+];
+for (const corner of PENTAGON) {
+  const gap = gapLV95(lv95Of(wgs84Of(corner)), corner);
+  assert.ok(gap <= LV95_ACCURACY_M, `${corner}: ${gap} m after a round trip`);
+}
+for (const { where, lv95 } of REFRAME) {
+  const gap = gapLV95(lv95Of(wgs84Of(lv95)), lv95);
+  assert.ok(gap <= ACCURACY_M + LV95_ACCURACY_M, `${where}: ${gap} m after a round trip`);
+}
+
+// SHEET_WGS84: every wgs84Of of the sheet's four sides, every 10 km, lies inside it, each of its
+// figures is the farthest rounded outward to a tenth of a degree, and its east lies under its
+// south - no longitude of it can be a latitude of it.
+const SIDES = [];
+for (let east = SHEET.west; east <= SHEET.east; east += 10_000)
+  SIDES.push([east, SHEET.south], [east, SHEET.north]);
+for (let north = SHEET.south; north <= SHEET.north; north += 10_000)
+  SIDES.push([SHEET.west, north], [SHEET.east, north]);
+const ON_SIDES = SIDES.map(wgs84Of);
+const longitudes = ON_SIDES.map(([longitude]) => longitude);
+const latitudes = ON_SIDES.map(([, latitude]) => latitude);
+const outward = (value, round) => round(value * 10) / 10;
+assert.deepEqual(SHEET_WGS84, {
+  west: outward(Math.min(...longitudes), Math.floor),
+  east: outward(Math.max(...longitudes), Math.ceil),
+  south: outward(Math.min(...latitudes), Math.floor),
+  north: outward(Math.max(...latitudes), Math.ceil),
+});
+for (const [longitude, latitude] of ON_SIDES) {
+  assert.ok(longitude >= SHEET_WGS84.west && longitude <= SHEET_WGS84.east, `${longitude}`);
+  assert.ok(latitude >= SHEET_WGS84.south && latitude <= SHEET_WGS84.north, `${latitude}`);
+}
+assert.ok(SHEET_WGS84.east < SHEET_WGS84.south);
+
 process.stdout.write(
-  `tools/sketch/kml: LV95 to WGS84 meets swisstopo's worked example to its printed figures, and three points of REFRAME within ${ACCURACY_M.toFixed(2)} m\n`,
+  `tools/sketch/kml: LV95 to WGS84 meets swisstopo's worked example to its printed figures, and three points of REFRAME within ${ACCURACY_M.toFixed(2)} m; WGS84 to LV95 meets its own, Bern's constants, REFRAME within ${LV95_ACCURACY_M} m and two round trips; the sheet lies in SHEET_WGS84\n`,
 );

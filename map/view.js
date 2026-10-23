@@ -1,10 +1,11 @@
 // The arithmetic of a view of the map (ST-031): which place lies under which pixel, which
-// pictures a view has and where each of them lies, and what a view becomes when it is brought
-// nearer, taken further or moved. A view is a level of the map service's ladder and the place at
-// its middle - `{ level, e, n }`, LV95 in metres - shown in a place of so many pixels,
-// `{ wide, high }`. Nothing here knows a page, an address or a request: map.js lays the pictures
-// and asks for them. view.check.js holds every figure by hand.
-import { CADASTRAL_FROM, LAYERS, LEVELS, SHEET, TILE_PX, matrixOf } from '../swisstopo/hosts.js';
+// pictures a view has and where each of them lies, what a view becomes when it is brought
+// nearer, taken further or moved, and where it goes for an outline taken. A view is a level of
+// the map service's ladder and the place at its middle - `{ level, e, n }`, LV95 in metres -
+// shown in a place of so many pixels, `{ wide, high }`. Nothing here knows a page, an address or
+// a request: map.js lays the pictures and asks for them. view.check.js holds every figure by hand.
+import { CADASTRAL_FROM, FOUND_AT, LAYERS, LEVELS, SHEET, TILE_PX } from '../swisstopo/hosts.js';
+import { matrixOf } from '../swisstopo/hosts.js';
 
 // The nearest level that the map has: a tenth of a metre a pixel.
 export const NEAREST = LEVELS.length - 1;
@@ -123,3 +124,29 @@ export const showing = (level, photo, from = CADASTRAL_FROM) => {
   if (from !== null) return level < from ? 'national' : 'cadastral';
   return level <= LAYERS.national.to ? 'national' : 'photo';
 };
+
+// How many pixels of the map an outline that was taken has to spare on each side, at the least.
+export const SPARE_PX = 20;
+
+/**
+ * Where the map goes for an outline that was taken - a parcel found or picked (ST-043, take.js),
+ * or a file's (ST-045) - `{ e, n, level }`: the middle of the box of its corners, each `[e, n]`,
+ * at the nearest level from `FOUND_AT` outward at which that box shows whole in a place of
+ * `{ wide, high }` pixels with `SPARE_PX` to spare on each side - the furthest, level 0, where
+ * none does.
+ */
+export function goesTo(corners, { wide, high }) {
+  const [es, ns] = [corners.map(([e]) => e), corners.map(([, n]) => n)];
+  const [west, east, south, north] = [
+    Math.min(...es),
+    Math.max(...es),
+    Math.min(...ns),
+    Math.max(...ns),
+  ];
+  const whole = (metres) =>
+    (east - west) / metres + 2 * SPARE_PX <= wide &&
+    (north - south) / metres + 2 * SPARE_PX <= high;
+  let level = FOUND_AT;
+  while (level > 0 && !whole(LEVELS[level])) level -= 1;
+  return { e: (west + east) / 2, n: (south + north) / 2, level };
+}

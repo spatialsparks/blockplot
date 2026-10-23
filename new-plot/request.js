@@ -16,7 +16,7 @@ export const CORNERS_MAX = 1000;
 const CORNERS_LEAST = 3;
 export const AROUND_MAX_M = 20;
 export const AROUND_M = 5;
-const FIELDS = ['name', 'corners', 'side', 'aroundM', 'on', 'parcel'];
+const FIELDS = ['name', 'corners', 'side', 'aroundM', 'on', 'parcel', 'file'];
 // What corners are marked on: a map - the national map where the pad offers no cadastre, else
 // the cadastral map from near (docs/sketch/cadastre.md) - the aerial photo, or a map and the photo,
 // in that order. Never the two maps: at no level do both show.
@@ -50,6 +50,19 @@ function isParcel(parcel) {
   return four && named && formed && typeof asGiven === 'boolean';
 }
 
+// And, where the corners came from a GeoJSON file the person gave (ST-045), whether they were
+// converted from WGS84, and whether they are still as the file gave them: two booleans, no more.
+// Such corners were shown on no map: `on` may then be `[]`, until a corner is set or moved.
+const FILE = ['wgs84', 'asGiven'];
+
+/** Whether an order's `file` is one: an object of the two, each true or false. */
+function isFile(file) {
+  if (file === null || typeof file !== 'object' || Array.isArray(file)) return false;
+  const keys = Object.keys(file);
+  const two = keys.length === FILE.length && keys.every((key) => FILE.includes(key));
+  return two && FILE.every((key) => typeof file[key] === 'boolean');
+}
+
 // The sheet of the map, in LV95. swisstopo/hosts.js has it as SHEET; it is said again here, for
 // this module imports nothing, and the check holds the two to be one.
 const SHEET = { west: 2_420_000, east: 2_900_000, south: 1_030_000, north: 1_350_000 };
@@ -61,7 +74,8 @@ const onSheet = ([east, north]) =>
 
 /**
  * An order for a plot, read - `{ name, corners, side, aroundM, on }`, and `parcel` where it had
- * one, `{ egrid, number, canton, asGiven }` and no more - or why it is none:
+ * one, `{ egrid, number, canton, asGiven }` and no more, or `file`, `{ wgs84, asGiven }` and no
+ * more, with which `on` may also be `[]` - never both - or why it is none:
  * `{ status: 400, refused }`, one sentence, the first of these that holds. `text` is the order as
  * JSON, as the map's page writes it. A name is given with no blank at either end, and a zero
  * with no minus. Whether the outline is one that a plot can have - no corner twice, an area, no
@@ -109,18 +123,29 @@ export function orderOf(text) {
       `The ground around the plot is none: 0 to ${AROUND_MAX_M} m, in steps of half a metre.`,
     );
   }
-  if (!MARKED_ON.includes(JSON.stringify(on))) {
+  const onNothing = Object.hasOwn(order, 'file') && Array.isArray(on) && on.length === 0;
+  if (!MARKED_ON.includes(JSON.stringify(on)) && !onNothing) {
     return refuse(
       'It does not say what the corners were marked on: a map, the aerial photo, or a map and the photo.',
     );
   }
   const read = { name: name.trim(), corners, side: Math.abs(side), aroundM: Math.abs(aroundM), on };
-  if (!Object.hasOwn(order, 'parcel')) return read;
-  if (!isParcel(order.parcel)) {
+  const [hasParcel, hasFile] = ['parcel', 'file'].map((key) => Object.hasOwn(order, key));
+  if (hasParcel && !isParcel(order.parcel)) {
     return refuse(
       `Its parcel is none: an EGRID, CH and twelve figures; a number of ${NUMBER_MAX} characters at the most; a canton, two capital letters; and whether its corners are as given.`,
     );
   }
+  if (hasFile && !isFile(order.file)) {
+    return refuse(
+      'Its file is none: whether its corners were converted from WGS84, and whether they are as given.',
+    );
+  }
+  if (hasParcel && hasFile) {
+    return refuse("It has a parcel and a file: its corners are the one's or the other's.");
+  }
+  if (hasFile) return { ...read, file: { wgs84: order.file.wgs84, asGiven: order.file.asGiven } };
+  if (!hasParcel) return read;
   const { egrid, number, canton, asGiven } = order.parcel;
   return { ...read, parcel: { egrid, number, canton, asGiven } };
 }

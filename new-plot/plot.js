@@ -166,21 +166,46 @@ function parcelWords({ egrid, number, canton, asGiven }, day) {
   };
 }
 
-/** Where a plot's figures came from: its credit and its sources, to the letter - what the corners were marked on, by `on`, or the parcel that they are, each tile of the ground, the day and the frame. With a parcel the credits are both: its boundary is the cadastral map's. */
-function whereFrom(on, parcel, tiles, day, { origin, bearingDeg }) {
+// What a file's source says after its first sentence: that the page cannot know where it came from.
+const UNRECORDED =
+  'Where the file came from, and on what terms, is not recorded. No survey: it has no legal effect.';
+
+/** The outline's words of a GeoJSON file the person gave (ST-045): in the credit, and as a source - as given or changed by hand since, converted from WGS84 or not. Nothing of the file but its corners. */
+function fileWords({ wgs84, asGiven }, day) {
+  // The words whole, for a script's word `from` before a quote reads as an import (making.check.js).
+  const [file, geojson] = asGiven
+    ? ['from a file', 'from a GeoJSON file']
+    : ['after a file', 'after a GeoJSON file'];
+  const converted = wgs84 ? ', converted from WGS84 to about a metre' : '';
+  const changed = asGiven ? '' : ', changed by hand';
+  const read = wgs84
+    ? ` in longitude and latitude (WGS84), read on ${day} and converted to LV95 by swisstopo's approximate formulas, good to about a metre, ${asGiven ? 'its corners unchanged since' : 'and changed by hand since'}`
+    : `, read on ${day}, ${asGiven ? 'its corners unchanged' : 'and changed by hand since'}`;
+  return {
+    credit: `Outline: ${file} you gave${converted}${changed}, no survey.`,
+    source: `Outline: ${geojson} you gave${read}. ${UNRECORDED}`,
+  };
+}
+
+/** The outline's words of corners marked by hand, on the maps that `on` names. */
+function handWords(on, day) {
   const maps = on.map((map) => MARKED_ON[map]).join(' and ');
+  return {
+    credit: `Outline: marked by hand on ${maps}, no survey.`,
+    source: `Outline: marked by hand on ${maps}, on ${day}. No survey: a corner is good to a few decimetres, and is no boundary of the land register.`,
+  };
+}
+
+/** Where a plot's figures came from: its credit and its sources, to the letter - what the corners were marked on, by `on`, or the parcel or the file that they are, each tile of the ground, the day and the frame. With a parcel the credits are both: its boundary is the cadastral map's. */
+function whereFrom({ on, parcel, file }, tiles, day, { origin, bearingDeg }) {
   const both = parcel !== undefined || on.includes('cadastral');
   const credits = both ? `${SWISSTOPO}, ${CADASTRAL}` : SWISSTOPO;
   const [east, north] = origin.map((metres) => metres.toFixed(2));
   const ground = ({ name, year }) =>
     `Ground: swissALTI3D of swisstopo, the tile ${name} in its state of ${year}, read on ${day}: a height every ${CELL_M} m, read between the four cells around it, in whole centimetres. ${SWISSTOPO}`;
-  const outline =
-    parcel === undefined
-      ? {
-          credit: `Outline: marked by hand on ${maps}, no survey.`,
-          source: `Outline: marked by hand on ${maps}, on ${day}. No survey: a corner is good to a few decimetres, and is no boundary of the land register.`,
-        }
-      : parcelWords(parcel, day);
+  let outline = handWords(on, day);
+  if (parcel !== undefined) outline = parcelWords(parcel, day);
+  if (file !== undefined) outline = fileWords(file, day);
   return {
     credit: `${outline.credit} Ground: swissALTI3D. ${credits}`,
     sources: [
@@ -194,7 +219,7 @@ function whereFrom(on, parcel, tiles, day, { origin, bearingDeg }) {
 /**
  * The plot of an order and the ground under it: `{ site }`, a site as the pad has one and as
  * `write` of plot-file.js takes it - or `{ refused }`, one sentence of `SAID`. `name`, `corners`,
- * `side`, `aroundM`, `on` and `parcel`, where it has one, are an order's (`orderOf` of request.js); `ground` is
+ * `side`, `aroundM`, `on`, and `parcel` or `file`, where it has one, are an order's (`orderOf` of request.js); `ground` is
  * `{ cells, heightsM, tiles }`, the ground of the box that `paperOf` gives of the order
  * (`heightAt`), with the tiles it was read from, each `{ name, year }`; `day` is the day, as
  * `2026-10-13`. By this rule, and in this order:
@@ -212,7 +237,7 @@ function whereFrom(on, parcel, tiles, day, { origin, bearingDeg }) {
  *   and no point of a house: a plot made here states neither. It says where it lies:
  *   `originLV95`, the frame's `origin` - the first corner of the side, to the centimetre.
  */
-export function plotOf({ name, corners, side, aroundM, on, parcel, ground, day }) {
+export function plotOf({ name, corners, side, aroundM, on, parcel, file, ground, day }) {
   const along = paperOf(corners, side, aroundM);
   const runs = () => quarterOf(fallOf(heightsOf(along, ground)));
   const paper = along.refused === undefined ? paperOf(corners, side, aroundM, runs()) : along;
@@ -226,6 +251,6 @@ export function plotOf({ name, corners, side, aroundM, on, parcel, ground, day }
   const { origin: originLV95, bearingDeg, xFromM, xToM, yFromM, yToM, outline } = paper;
   const paperM = { xFromM, xToM, yFromM, yToM, sideM };
   const drawn = { bearingDeg, originLV95, ...paperM, outline, notes: [] };
-  const from = whereFrom(on, parcel, ground.tiles, day, paper);
+  const from = whereFrom({ on, parcel, file }, ground.tiles, day, paper);
   return { site: { name, cellM: CELL_M, ...drawn, ground: groundOf(heights, baseM), ...from } };
 }

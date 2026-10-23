@@ -67,7 +67,15 @@ const SAID = [
   { corners: '4 corners, 420 m².', survey: SURVEY, paper: lies(1, 4, 30, 40, 30) },
   { corners: '5 corners, 520 m².', survey: SURVEY, paper: lies(1, 5, 30, 40, 30) },
 ];
-const NOTHING = { corners: [], side: 0, on: [], paper: null, parcel: null, said: SAID[0] };
+const NOTHING = {
+  corners: [],
+  side: 0,
+  on: [],
+  paper: null,
+  parcel: null,
+  file: null,
+  said: SAID[0],
+};
 const empty = (aroundM) => ({ ...NOTHING, aroundM });
 assert.deepEqual(plot.read(), empty(5));
 PENTAGON.forEach((place, at) => {
