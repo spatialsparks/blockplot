@@ -2,7 +2,8 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <!-- The page asks the address it came from - its files, its kept sketches - and no other (directive 34). -->
+    <!-- The page asks the address it came from - its files, its kept sketches - and no other (directive 34).
+         A second policy, under/lay.js's, lets pictures come from there and from the map's one origin. -->
     <meta http-equiv="Content-Security-Policy" content="connect-src 'self'" />
     <title>Sketch pad</title>
     <!-- The stylesheets, each by its bare name, so that the page finds them from its file too:
@@ -10,7 +11,7 @@
          the one look of both; what this page alone has - the paper, the alarm, the layers, the
          gallery (pad.css); the colours, the toolbar's palette and the swatch's (colours.css);
          the small drawings of the toolbar's controls, shared too; then the boundary distances'
-         panel and the right button's menu. -->
+         panel, the right button's menu, and the map under the top view. -->
     <link rel="stylesheet" href="frame.css" />
     <link rel="stylesheet" href="pad.css" />
     <link rel="stylesheet" href="colours.css" />
@@ -18,6 +19,7 @@
     <link rel="stylesheet" href="icons.css" />
     <link rel="stylesheet" href="distances/distances.css" />
     <link rel="stylesheet" href="right-menu.css" />
+    <link rel="stylesheet" href="under/under.css" />
   </head>
   <body>
     <!-- The toolbar: five groups, each a direct child of it and named by its label, which
@@ -59,6 +61,20 @@
         >
           ⤢
         </button>
+        <!-- swisstopo's map under the top view: the choice of map is a menu, as File is - its
+             button says the chosen map, and under/switch.js puts an entry a layer in its part
+             and shows it all where the map is offered. -->
+        <span id="under-control" hidden>
+          <label><input type="checkbox" id="under-on" /> Map</label>
+          <button
+            type="button"
+            id="under-layer"
+            aria-expanded="false"
+            aria-controls="under-layers"
+          ></button>
+          <span class="menu" id="under-layers" hidden></span>
+          <input type="range" id="under-strength" min="0" max="100" aria-label="How strongly" />
+        </span>
       </span>
       <span class="group" id="edit-group" role="group" aria-label="Edit">
         <button type="button" id="undo" title="Ctrl+Z">Undo</button>
@@ -172,7 +188,10 @@
         </div>
         <p id="layers-hint"></p>
       </aside>
-      <main id="scroller"><canvas id="paper" role="img"></canvas></main>
+      <main id="scroller">
+        <div id="under-map" hidden></div>
+        <canvas id="paper" role="img"></canvas>
+      </main>
       <!-- What is selected: page.js writes the pad's words of it, and category-list.js puts its
            row right after them. Always there and as wide: the paper lies where it lay. After it
            gallery.js puts the gallery, which shows in its place while Object is the tool. -->
@@ -254,7 +273,9 @@
       <script src="lines/panel.js"></script>
       <script src="lines/list.js"></script>
       <script src="right-menu.js"></script>
+      <script type="module" src="under/lay.js"></script>
       <script src="page.js"></script>
+      <script type="module" src="under/switch.js"></script>
     </template>
     <script
       src="boot.js"
