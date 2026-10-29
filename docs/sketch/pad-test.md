@@ -41,7 +41,8 @@ address, a stand-in's port; and for the browser tests of the map,
 and `sketch-map-plain.spec.ts`, and
 of the marking, `sketch-new-plot.spec.ts`, `sketch-new-plot-made.spec.ts` (T-031.7),
 `sketch-new-plot-unseen.spec.ts`, `sketch-new-plot-large.spec.ts`,
-`sketch-new-plot-parcel.spec.ts` and `sketch-new-plot-file.spec.ts` (T-045.5), in the module that the ten share, each taking its `test`
+`sketch-new-plot-parcel.spec.ts` and `sketch-new-plot-file.spec.ts` (T-045.5), and of the map under
+the top view, `sketch-under-map.spec.ts` (T-046.3), in the module that the eleven share, each taking its `test`
 from there, `tests/e2e/sketch-own-pad.ts` (T-031.5): each case on a pad and a stand-in of
 its own (`docs/sketch/map.md`) — and in `sketch-new-plot-folder.spec.ts`, whose pad and stand-in
 `startOwn` of that module starts, and which has a gate of its own browser (T-041.5). **What it does not reach**: a check that
@@ -78,7 +79,22 @@ which its note says (`docs/sketch/kml.md`), one of `tools/sketch/store/` — `ru
 browser's store's names, keys and rules by hand, that no module of the store asks a machine or
 takes a record away, that `tools/sketch/plot-file.js` and what it loads import nothing of Node,
 and that `write`'s equality of its own holds what Node's held (T-040.1) — which its note says
-(`tools/sketch/store/CLAUDE.md`, "Test"), and the pad's own,
+(`tools/sketch/store/CLAUDE.md`, "Test"), one of `tools/sketch/under/` — `place.check.js`,
+where swisstopo's map lies under the top view, by hand on the made-up plot's paper and the
+pad's own `paper.js` and `grid.js`: the level, the scale, the turn, the box and the place under
+the window's middle at bearings of 0, 90, 232 and one whose sine is 3/5, nearer than the nearest
+level, even and far out; the two refusals; a corner of the plot from LV95 onto the screen within
+a millionth of a pixel of where the top view draws it; a far view's twenty pictures; and at every
+rung of the zoom's ladder the level's rule and the bound on the pictures (ST-046, T-046.1) — and
+`lay.check.js`, the map's pictures under the top view by hand: whom it asks, and that a pad
+without New plot or a stand-in offers no map; the page's second policy to the letter and its
+first unchanged; which pictures a view lays, of which level and at which address, nearer than
+a layer's last level and, for the cadastral map, further out than its own; which stay, go and
+are asked for as the view moves; and where `index.html` names its script (T-046.2) — and
+`switch.check.js`, what the tab keeps of the control "Map" and reads back, in a tree with the
+cadastral map and in Blockplot's, a strength out of range, the slider's figure and back, and
+where `index.html` has the control and its script (T-046.3) — which
+its note says (`docs/sketch/under.md`, "Test"), and the pad's own,
 `tools/sketch/offline.check.js` among them.
 `tools/sketch/categories.check.js`, the categories (ST-028), with the pad's scripts that need no paper and
 no sketch, and the made-up plot for the ground: the list against the story's table, typed in
@@ -1208,7 +1224,9 @@ runs it: `pnpm verify` has the same tests in `pnpm e2e`, beside the web app's (`
   none — is opened by Open kept as "Open file" opens that file: the same sketch in the browser's
   store, the same step to undo, and the same words where it is refused; a plot given as its file
   keeps in the browser, by its id, and says so; and the page's policy lets it ask its own server
-  and nobody else — which answers `/kept/` with 404
+  and nobody else — which answers `/kept/` with 404 — its two policies, `connect-src 'self'` in
+  its markup and `img-src 'self' data:` that `under/lay.js` puts in on a pad that offers no map,
+  refusing a picture of another origin before it is asked (ST-046)
 - `sketch-kept-folder.spec.ts` — Keep and Open kept on a plot that came as its folder (T-040.5),
   in `sketch-folder.ts`'s browser, on the terrace plot's folder: Keep writes
   `sketches/<name>.json` there, byte for byte what "Save file" saves (its download, read back),
@@ -1353,6 +1371,21 @@ runs it: `pnpm verify` has the same tests in `pnpm e2e`, beside the web app's (`
   of the page carried a body, and the stand-in was asked, with the pad's origin, the pictures of
   the map and the eight GETs of the ground, one after the other — an `OPTIONS` for one of them
   at most — and nothing else: no search, and no word of the file
+- `sketch-under-map.spec.ts` — **the story's one end-to-end test of ST-046** (T-046.3): swisstopo's
+  map under the top view. Its first case is on a pad and a stand-in of its own
+  (`sketch-own-pad.ts`), the pad told nothing and its page told the stand-in by `?asks=`, the
+  trial plot `tests/__fixtures__/new-plot/trial-slope-photo.json` held in the browser as the plot
+  shown last; it names nothing of the cadastre, and so passes in both trees. The control "Map"
+  in the View group, off, the photo and 50 % first, and nothing asked; switched on, the photo's
+  pictures under the paper, every one come, their box turned `90 - bearingDeg`, each at 0.5, the
+  credits shown and the canvas without its ground; 20 % on the slider, each picture at 0.2 and
+  the canvas as it was; the national map chosen, its pictures; a slice, no control, no picture,
+  no credits, nothing more asked, and the top view with them again; 30 % kept through a reload,
+  and off in a new tab; Picture (PNG) byte for byte the same with the map on as off; switched
+  off, nothing more asked; the sketch saved, the plot held and `localStorage` holding nothing of
+  the map; and every request the stand-in heard a GET of a picture of a layer of `LAYERS`. Its
+  pictures, `under.png` and `slice.png`, are for a look. Its second case, on the made-up pad:
+  told a stand-in, the page offers no map, and the control stays hidden
 - `sketch-edgeless.spec.ts` — **the story's one end-to-end test of ST-042** (T-042.3), from
   above on the made-up plot, a sketch of one level and no thing: the grid 0.5 m at 8 px a cell,
   then 1, 1, 2, 2 and 5 m at five clicks of `#smaller`; a block drawn by Block from (150.3,
@@ -1445,7 +1478,8 @@ marking's `sketch-new-plot.spec.ts`, `sketch-new-plot-made.spec.ts` (T-031.7),
 `sketch-new-plot-unseen.spec.ts` (T-041.3) and `sketch-new-plot-large.spec.ts` (T-042.4), the
 one of the word of plain ground, `sketch-map-plain.spec.ts` (T-031.8), the story's end-to-end
 test of ST-043, `sketch-new-plot-parcel.spec.ts` (T-043.6), that of ST-045,
-`sketch-new-plot-file.spec.ts` (T-045.5), and the story's end-to-end test of ST-041, `sketch-new-plot-folder.spec.ts` (T-041.5), in `sketch-folder.ts`'s browser. The tests of Open plot and of the plot shown last,
+`sketch-new-plot-file.spec.ts` (T-045.5), that of ST-046, `sketch-under-map.spec.ts` (T-046.3),
+whose page of the pad is told the stand-in, and the story's end-to-end test of ST-041, `sketch-new-plot-folder.spec.ts` (T-041.5), in `sketch-folder.ts`'s browser. The tests of Open plot and of the plot shown last,
 `sketch-plots.spec.ts` (T-040.3) and `sketch-plots-last.spec.ts` (T-040.2), hold plots in the
 browser's store of the made-up pad instead.
 
@@ -1465,7 +1499,7 @@ cadastral map's layer of `sketch-own-pad.ts`'s `LAYERS` is its, and so is every 
 what shows from level 25 on in `sketch-map-layers.spec.ts`, `sketch-map-find.spec.ts`,
 `sketch-new-plot.spec.ts`, `sketch-new-plot-made.spec.ts`, `sketch-new-plot-folder.spec.ts` and
 `sketch-new-plot-unseen.spec.ts`, and the files of `sketch-map.spec.ts`: each passes in both
-trees, and so does `sketch-new-plot-file.spec.ts`, which expects nothing of it. Two are the cadastre's whole, and Blockplot's tree has neither: `sketch-map-plain.spec.ts`,
+trees, and so do `sketch-new-plot-file.spec.ts` and `sketch-under-map.spec.ts`, which expect nothing of it. Two are the cadastre's whole, and Blockplot's tree has neither: `sketch-map-plain.spec.ts`,
 the word of plain ground, which shows with the cadastral map alone, and
 `sketch-new-plot-parcel.spec.ts`, the parcel taken.
 `playwright.sketch.config.ts` starts the made-up pad

@@ -207,7 +207,11 @@ test('a plot given as its file keeps in the browser, by its id, and says so', as
 test('the policy of the page lets it ask its own server, and nobody else', async ({ page }) => {
   await openPad(page, null);
   const policy = page.locator('meta[http-equiv="Content-Security-Policy"]');
-  await expect(policy).toHaveAttribute('content', "connect-src 'self'");
+  // The first, in the markup; the second, under/lay.js's: pictures from here alone, on a pad
+  // with no New plot and no stand-in, which offers no map (ST-046).
+  await expect(policy).toHaveCount(2);
+  await expect(policy.first()).toHaveAttribute('content', "connect-src 'self'");
+  await expect(policy.nth(1)).toHaveAttribute('content', "img-src 'self' data:");
   // Asked of the pad itself, the page is answered. Asked of another origin, it is refused by its
   // own policy - and were the policy gone, the answer would come from here, in the browser: no
   // request leaves this machine.
@@ -221,5 +225,10 @@ test('the policy of the page lets it ask its own server, and nobody else', async
   expect(await page.evaluate<string>(ask('/frame.css'))).toBe('200');
   expect(await page.evaluate<string>(ask('/kept/'))).toBe('404');
   expect(await page.evaluate<string>(ask(`${ELSEWHERE}kept/`))).toBe('refused');
+  // A picture of another origin is refused too, and asked of nobody.
+  const picture = (address: string): string =>
+    `new Promise((said) => Object.assign(new Image(), { onload: () => said('came'),
+      onerror: () => said('refused'), src: ${JSON.stringify(address)} }))`;
+  expect(await page.evaluate<string>(picture(`${ELSEWHERE}picture.png`))).toBe('refused');
   expect(elsewhere).toEqual([]);
 });

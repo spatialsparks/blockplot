@@ -279,14 +279,14 @@ test('a request that leaves this machine is refused by the fixture, which fails 
   pad,
 }) => {
   // Marked as failing: this case passes only because the fixture refused the request and failed
-  // it. On the pad's own page, whose policy lets a picture come from anywhere, the address of a
+  // it. On the pad's Info page, whose policy lets a picture come from anywhere, the address of a
   // picture is set to a name that leads nowhere. Nothing of the case itself fails it: what a
   // step of it throws is caught, and what the console says of the picture is waited for and
   // taken out.
   test.fail();
   const asks = async (): Promise<void> => {
     const page = await pad.browser.newPage();
-    await page.goto('/');
+    await page.goto('/info.html');
     await page.evaluate(`new Promise((done) => Object.assign(new Image(),
       { onload: done, onerror: done, src: '${NOWHERE}x.png' })).then(() => null)`);
     await wrongOf(pad, 1);

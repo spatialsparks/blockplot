@@ -2,7 +2,10 @@
 
 Whom the sketch pad asks, and how (ST-031): the Federal Office of Topography, swisstopo, for the
 page of a new plot — the one exception to "the sketch pad's pages ask the address they were
-served from, … and nobody else" (directive 34; `docs/ARCHITECTURE.md`, "The network"). Here are the rules, the pad's one way
+served from, … and nobody else" (directive 34; `docs/ARCHITECTURE.md`, "The network") — and,
+since ST-046, for the pictures of the map under the top view, while the owner has it switched on:
+`tools/sketch/under/lay.js` asks the map service, by `tileAddress` of the origin that `asksOf`
+reads of the pad page's own word `asks`, and nothing else (`docs/sketch/under.md`). Here are the rules, the pad's one way
 of asking, `tools/sketch/swisstopo/door.js`, the pad's own reader of swissALTI3D — the catalogue, a tile in parts, the
 ground of a box — and the stand-in that checks and browser tests ask in swisstopo's place.
 **The page asks**: `plotMadeOf` of `tools/sketch/new-plot/making.js` calls `groundOf`, for an order,

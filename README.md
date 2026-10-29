@@ -52,8 +52,16 @@ A plot is opened with **File, Open plot**, in one of two ways:
 
 Your plot and your sketches stay on your computer: in the browser's own store, or in the folder
 you picked. Nothing you draw is sent anywhere, and nothing of a GeoJSON file you give New plot.
-New plot alone asks another machine, swisstopo's, for the map, a place and the ground. [PRIVACY.md](PRIVACY.md) says exactly what is asked, of
-whom, and what each can see.
+Two places ask another machine, swisstopo's, and nobody else:
+
+- **New plot**, for the map, a place and the ground;
+- **the top view, while its Map is switched on**: it asks `wmts.geo.admin.ch` for the pictures
+  of the map it lays under the paper, the national map or the aerial photo, with "© swisstopo"
+  shown in its corner. Map is off in a new tab; off, or in a slice, the top view asks
+  nothing. Those pictures tell swisstopo which part of the map you look at, and so where your
+  plot lies, as New plot's map does.
+
+[PRIVACY.md](PRIVACY.md) says exactly what is asked, of whom, and what each can see.
 
 ## Run it on your own computer
 
@@ -109,8 +117,9 @@ repository is one release of the pad, as it was when it was released.
 - **[three.js](https://threejs.org/)**, which draws the 3D page — under the MIT licence,
   © 2010-2026 three.js authors.
 - **swisstopo**, the Federal Office of Topography, whose national map, aerial photo, place search
-  and height model, swissALTI3D, New plot shows and asks. The map shows "© swisstopo" wherever it
-  shows, and a plot made on the map keeps its credit in its file.
+  and height model, swissALTI3D, New plot shows and asks, and whose map the top view lays under
+  the paper. The map shows "© swisstopo" wherever it shows, and a plot made on the map keeps its
+  credit in its file.
 
 ## Licence
 

@@ -248,12 +248,15 @@
     marks.take({ ...pen, box, middle, edge }); // What is drawn over all the rest: draw-marks.js.
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.globalAlpha = 1;
+    // Over swisstopo's map, from above (under/lay.js), no ground: neither grey beyond nor white.
+    const over = globalThis.under?.shows() === true;
     ctx.fillStyle = PLANE === 'top' ? BEYOND : '#fff';
-    ctx.fillRect(0, 0, wide, high);
+    if (over) ctx.clearRect(0, 0, wide, high);
+    else ctx.fillRect(0, 0, wide, high);
     // Half a pixel on, so that a hairline on a grid line fills one row of pixels, not two.
     lay(0.5);
     ctx.fillStyle = '#fff';
-    ctx.fillRect(0, 0, WIDE, ROWS);
+    if (!over) ctx.fillRect(0, 0, WIDE, ROWS);
     const strength = (layer) => (layer.faded ? FADED : FULL);
     if (PLANE !== 'top') land.ground(pen, cuts[PLANE]);
     for (const layer of layers) boxes(layer, strength(layer).boxes);
@@ -262,5 +265,6 @@
     for (const layer of layers) ink(layer, strength(layer).ink);
     for (const one of [picked ?? []].flat()) marks.mark(one);
     if (preview) marks.stroke(preview);
+    globalThis.under?.lay(); // The map's pictures follow the window, under the canvas.
   };
 })();

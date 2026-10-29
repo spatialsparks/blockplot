@@ -4,16 +4,18 @@ Blockplot keeps nothing of yours on any server. It has no account and sets no co
 nobody and shows no advert. This page says every machine its pages ask, what they ask it for,
 and what that machine can see.
 
-## The pages ask where they came from, and nobody else
+## The pages ask where they came from, and swisstopo in two places
 
 The pad's pages ask the address they were served from, for their own files — pages, scripts,
-styles and three.js — and nobody else. The 3D page and the Info page ask nobody at all beyond
-their own files: what the 3D page saves, it writes in the page and hands to your browser.
+styles and three.js. Two places alone ask another machine, swisstopo, the Federal Office of
+Topography: **File, New plot**, and **the top view while its Map is switched on**. The 3D page
+and the Info page ask nobody at all beyond their own files: what the 3D page saves, it writes in
+the page and hands to your browser.
 
 ## New plot asks swisstopo
 
-**File, New plot** alone asks another machine: swisstopo, the Federal Office of Topography, from
-the moment its page is opened. It asks three hosts of swisstopo's, and no fourth:
+**File, New plot** asks swisstopo from the moment its page is opened. It asks three hosts of
+swisstopo's, and no fourth:
 
 | Host | Asked for |
 | --- | --- |
@@ -39,6 +41,30 @@ kept in the browser's store: not its name, its properties or its text. Its corne
 the plot, and the ground under them is asked for as it is for any plot — which tells swisstopo
 where the plot lies, as above.
 
+## The top view asks swisstopo while its Map is on
+
+**The top view's Map**, in the toolbar's View group, lays swisstopo's map under the paper, so
+that a house that stands on the plot can be traced. It is off in a new tab and on a new pad,
+and while it is off the top view asks nobody. Switched on, it asks one host of swisstopo's, and
+no other:
+
+| Host | Asked for |
+| --- | --- |
+| `wmts.geo.admin.ch` | the pictures of the map under the paper: the national map or the aerial photo, the one you choose |
+
+It asks only while the map shows: in the top view, with Map switched on, on a plot that has a
+place on swisstopo's map. A slice, 3D, Info and the sections never show it, and ask for no
+picture; switched off, or in a slice, the top view asks for nothing more. The credits of the
+map, "© swisstopo", stand in a corner of the top view whenever its pictures show.
+
+What that lets swisstopo see: which part of the map you look at, and how near — **and so where
+your plot lies**, for the pictures asked for are those under it, as New plot's map tells it
+already. The pictures go as New plot's do: without a cookie and without a referrer, with the
+browser's own `Origin`, and nothing of the plot or the sketch in them, not its name.
+
+Nothing of the map goes into the plot, a sketch, a kept sketch or a file the pad saves. Whether
+the map is on, which map, and how strongly it shows are kept for that tab alone, as the zoom is.
+
 ## What you draw never leaves your browser
 
 A plot and its sketches are kept on your computer, and nothing of them is sent anywhere:
@@ -61,4 +87,5 @@ says what it keeps of that.
 ## On your own computer
 
 Run with `pnpm sketch`, the pad is served on 127.0.0.1 alone, at http://127.0.0.1:4764: no
-other computer can reach it. New plot asks swisstopo there as it does on the web.
+other computer can reach it. New plot, and the top view while its Map is on, ask swisstopo
+there as they do on the web.

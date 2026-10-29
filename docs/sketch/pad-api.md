@@ -120,7 +120,12 @@ from here.
   79 on one line, which it is in a window of 1440 and of 1280 on all three pages (T-029.6,
   T-032.5, Gotchas). The pad's page has five, in this order, then one button that stands in
   no group, and `#title` after them: `#file-group`, File; `#view-group` — `#views`, `#smaller`, `#larger`,
-  `#fit`, "Zoom to fit" (T-042.3);
+  `#fit`, "Zoom to fit" (T-042.3), and after it, in the top view alone and only where the page
+  offers swisstopo's map under it, `#under-control`, "Map": a switch, a choice of map — a
+  menu, as File is: `#under-layer`, a button that says the chosen map and opens `#under-layers`,
+  an entry a layer, and no `<select>` — and a slider of how strongly it shows, two rows in the group's height (`tools/sketch/under/switch.js`,
+  `under.css`, T-046.3; `docs/sketch/under.md`) — hidden on the made-up pad, so its toolbar is
+  as it was;
   `#edit-group` — `#undo`, `#redo` and the tools `move`, `merge`, `line`, `text`, `erase`;
   `#block-group` — `#high-row` with `#high`, and `#palette`, the colours, which
   `tools/sketch/palette.js` makes (T-039.1): `#colour`, the colour to draw with, which is the
@@ -531,8 +536,10 @@ from here.
   as it shows, a pixel of it a pixel of the screen, the place `left`, `top`, in cells of the
   view as the screen shows its columns, at its top left corner, and `px` CSS pixels a cell drawn
   at `px × devicePixelRatio` exactly, with the window's corner and each box's edges on whole
-  pixels; from above all of the window `#f4f5f7` and the plot's paper white on it, in a slice
-  white; the marks of what is selected and the stroke in progress by
+  pixels; from above all of the window `#f4f5f7` and the plot's paper white on it — neither
+  while `under.shows()` says that swisstopo's map lies under the paper, whose pictures
+  `under.lay()`, called after each draw, lays in `#under-map` under the canvas
+  (`docs/sketch/under.md`) — in a slice white; the marks of what is selected and the stroke in progress by
   `tools/sketch/draw-marks.js`, `globalThis.marks` — `take(pen)`, `arrow`, `mark`, `stroke` —
   loaded by `index.html` right after `draw.js` (ST-042);
   `tools/sketch/zoom.js` — what the window shows: `zoom.px`, on the rungs of `grid.LADDER`, from
